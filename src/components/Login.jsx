@@ -8,31 +8,35 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  console.log("sdefrghjklkjhgfd");
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = {
+      email: email,
+      password: password,
+    };
+    console.log(formData);
+    try {
+      // Send a POST request to the backend using Axios
+      const response = await axios.post(
+        "https://skillsphere-backend.onrender.com",
+        formData
+      );
 
-      try {
-        // Send a POST request to the backend using Axios
-        const response = await axios.post(
-          "https://skillsphere-backend-1.onrender.com/api/register",
-          formData
-        );
+      // Extract data from response
+      const { message, user } = response.data;
+      console.log("response data from frontend : ", response.data);
+      alert(message); // Show success message
 
-        // Extract data from response
-        const { message, user } = response.data;
-
-        alert(message); // Show success message
-
-        navigate("/login"); // Redirect to login page
-      } catch (error) {
-        // Handle errors from the backend
-        if (error.response) {
-          alert(`Error: ${error.response.data.message}`);
-        } else {
-          alert("Server error. Please try again later.");
-        }
+      navigate("/login"); // Redirect to login page
+    } catch (error) {
+      // Handle errors from the backend
+      if (error.response) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert("Server error. Please try again later.");
       }
+    }
   };
 
   return (

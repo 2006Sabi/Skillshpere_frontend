@@ -19,7 +19,7 @@ const Login = () => {
     try {
       // Send a POST request to the backend using Axios
       const response = await axios.post(
-        "https://skillsphere-backend.onrender.com",
+        "https://skillsphere-backend.onrender.com/api/login",
         formData
       );
 

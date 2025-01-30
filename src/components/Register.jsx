@@ -39,7 +39,7 @@ const Register = () => {
   try {
     // Send a request to the backend
     const response = await fetch(
-      "https://skillsphere-backend.onrender.com",
+      "https://skillsphere-backend.onrender.com/api/register",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

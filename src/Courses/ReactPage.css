@@ -1,0 +1,35 @@
+.react-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.react-section {
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #f4f4f4;
+  border-left: 5px solid #61dafb;
+  border-radius: 5px;
+}
+
+.react-section h2 {
+  color: #20232a;
+}
+
+.react-section p {
+  line-height: 1.6;
+}
+
+.react-section ul {
+  list-style-type: square;
+  padding-left: 20px;
+}
+
+.react-section pre {
+  background: #282c34;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}

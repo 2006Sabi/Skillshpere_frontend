@@ -1,0 +1,16 @@
+/* Default Light Mode */
+.light {
+  background-color: lightblue;
+  color: grey;
+}
+
+/* Dark Mode */
+.dark {
+  background-color: grey;
+  color: lightblue;
+}
+
+/* Ensure Navbar and Other Components Adapt */
+.navbar {
+  background-color: inherit; /* Use the parent theme */
+}

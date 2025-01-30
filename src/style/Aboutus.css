@@ -1,0 +1,57 @@
+/* Ensure the navbar remains black */
+.navbar {
+  background-color: black;
+}
+body, html {
+  height: 100%;
+  overflow-y: auto; /* Enables scrolling */
+}
+
+/* Set about1.jpg as background */
+.aboutus-container {
+  background: url("../images/about1.jpg") no-repeat center center;
+  background-size: cover;
+  min-height: 100vh; /* Ensure full viewport height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; /* Allow content to stack */
+  overflow: auto; /* Enable scrolling */
+}
+
+/* Ensure remaining content is visible */
+.aboutus {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 3rem;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 90%;
+  text-align: center;
+  overflow: hidden; /* Prevents content from being clipped */
+}
+
+/* Style the heading */
+.aboutus-content h2 {
+  font-size: 3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: black;
+}
+
+.aboutus-content h2 span {
+  color: #007bff; /* Highlighted in blue */
+}
+
+.aboutus-content h3 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  color: #333;
+}
+
+.aboutus-content p,
+.aboutus-content li {
+  font-size: 1.2rem;
+  color: #555;
+  line-height: 1.6;
+}

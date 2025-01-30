@@ -1,0 +1,71 @@
+/* General Styles */
+.courses {
+  font-family: Arial, sans-serif;
+  padding: 2rem;
+  text-align: center;
+  background-color: #f8f9fa;
+}
+
+.courses h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: black;
+  padding: 30px;
+  text-align: center;
+}
+
+/* Course Boxes */
+.courses-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.course-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 250px;
+  height: 250px;
+  background-color: white;
+  border: 2px solid #ddd;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.course-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.course-box img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.course-box span {
+  color: #333;
+  margin-top: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .courses-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .course-box {
+    width: 90%;
+    max-width: 300px;
+  }
+}

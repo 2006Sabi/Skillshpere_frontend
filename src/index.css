@@ -1,0 +1,12 @@
+/* Apply background color to the whole page */
+body {
+  background-color: #ADD8E6; /* Light Blue */
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Ensure all text is visible */
+h1, h2, h3, p {
+  color: #333; /* Dark Grey for text */
+}

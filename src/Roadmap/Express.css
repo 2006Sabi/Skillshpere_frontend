@@ -1,0 +1,170 @@
+/* General Styles */
+mongodb-body {
+  background-color: white;
+  background-image: url('./mongodb.jpg'); /* Add the background image */
+  background-size: cover;  /* Ensure the image covers the whole body */
+  background-position: center center; /* Position the image at the center */
+  background-attachment: fixed; /* Keep the background fixed while scrolling */
+}
+
+.timeline2 h1 {
+  text-decoration: dotted;
+  color: black;
+  margin-left: 10%;
+  padding: 50px;
+  margin-top: 0%;
+  font-size: 60px;
+}
+.text-box2 h2 {
+  font-weight: 600;
+  color: white; /* Ensure the heading text is white */
+}
+
+.text-box2 p {
+  color: white; /* Ensure paragraph text inside text-box is white */
+}
+
+.timeline2 {
+  position: relative;
+  max-width: 1200px;
+  margin: 100px auto;
+  color: black;
+}
+
+.container2 {
+  padding: 10px 50px;
+  position: relative;
+  width: 50%;
+}
+
+.text-box2 {
+  padding: 20px 30px;
+  background: black; /* Set the box color to black */
+  color: white; /* Set the text color to white */
+  position: relative;
+  border-radius: 30px;
+  font-size: 25px;
+}
+
+.left-container2 {
+  left: 0;
+  padding: 0.5px;
+  margin-left: 2%;
+}
+
+.right-container2 {
+  left: 52%;
+}
+.timeline2::after {
+  content: '';
+  position: absolute;
+  width: 6px; /* Adjust thickness */
+  height: 100%; /* Ensure it covers full timeline */
+  background: black; /* Adjust color if needed */
+  top: 200px;
+  left: 47%;
+  margin-left: 80px;
+  transform: translateX(-50%);
+  z-index: 1; /* Ensure it appears behind elements */
+}
+
+.timeline2 {
+  margin-top: 10px;
+  min-height: 100vh; /* Ensures enough space for the line */
+  position: relative;
+}
+
+.text-box2 h2 {
+  font-weight: 600;
+}
+
+.left-container2-arrow {
+  height: 0;
+  width: 0;
+  position: absolute;
+  top: 28px;
+  z-index: 1;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 15px solid black;
+  right: -15px;
+}
+.left-container2 {
+  left: 0;
+  padding: 0.5px;
+  margin-left: 1%;
+
+}
+
+.right-container2{
+  left: 52%;
+}
+
+.right-container2-arrow{
+  height: 0;
+  width: 0;
+  position: absolute;
+  top: 28px;
+  z-index: 1;
+  left: 56%;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-right: 15px solid black;
+  left: -15px;
+}
+
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+  .timeline2 h1 {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .timeline2 {
+    margin: 50px 20px;
+  }
+
+  .container2 {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .left-container2,
+  .right-container2 {
+    left: 0;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .text-box2 {
+    font-size: 14px;
+    padding: 15px;
+  }
+
+  .left-container2-arrow,
+  .right-container2-arrow {
+    display: none;
+  }
+
+  .timeline2::after {
+    left: 50%;
+    margin-left: -3px;
+  }
+}
+
+/* Additional media query for very small screens (like mobile phones in portrait mode) */
+@media (max-width: 480px) {
+  timeline2 h1 {
+    font-size: 20px;
+  }
+
+  .container2 {
+    width: 100%;
+    padding: 5px;
+  }
+
+  .text-box2 {
+    font-size: 12px;
+    padding: 10px;
+  }
+}

@@ -1,0 +1,87 @@
+/* General Styles */
+.feedback-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  height: 600px;
+  background: #000000; /* Changed to black */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.feedback-container h2 {
+  color: #fff; /* Change text color to white for contrast */
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.feedback-container p {
+  color: #ddd; /* Change text color to light gray */
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Success Message */
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Form Styling */
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-form label {
+  text-align: left;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #fff; /* White text for labels */
+}
+
+.feedback-form input,
+.feedback-form select,
+.feedback-form textarea {
+  width:90%;
+  padding: 15px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.feedback-form textarea {
+  height: 100px;
+  resize: none;
+}
+
+/* Submit Button */
+.feedback-form button {
+  background-color: white;
+  color: black;
+  padding: 18px;
+  font-size: 16px;
+  width: 90%;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background 0.3s ease-in-out;
+}
+
+.feedback-form button:hover {
+  background-color: #45a049;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  .feedback-container {
+    width: 90%;
+    margin: 20px auto;
+  }
+}

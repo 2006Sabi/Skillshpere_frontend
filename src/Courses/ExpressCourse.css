@@ -1,0 +1,48 @@
+.express-page {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: #d35400;
+}
+
+.express-section {
+  background-color: #f4f4f4;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
+.express-section h2 {
+  color: #e67e22;
+}
+
+.express-section p {
+  font-size: 16px;
+}
+
+.express-section pre {
+  background-color: #222;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.express-section ul {
+  list-style-type: square;
+  padding-left: 20px;
+}
+
+.express-section ol {
+  padding-left: 20px;
+}
+
+a {
+  color: #e67e22;
+  text-decoration: none;
+}

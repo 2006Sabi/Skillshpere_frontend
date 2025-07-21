@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Homepage from "./components/Homepage.jsx";
 import Aboutus from "./components/Aboutus.jsx";
 import Roadmaps from "./components/Roadmaps.jsx";
@@ -17,11 +18,22 @@ import Register from "./components/Register.jsx";
 import Feedback from "./components/Feedback.jsx";
 import Login from "./components/Login.jsx";
 import PrivateRoute from "./components/PrivateRoute"; // Import PrivateRoute
+import "./App.css";
 
 const App = () => {
+  const [theme, setTheme] = useState("light");
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
   return (
-    <>
-      <Navbar />
+    <div className={`app ${theme}`}>
+      <Navbar theme={theme} toggleTheme={toggleTheme} />
       <Routes>
         {/* Public Routes */}
         <Route path="/register" element={<Register />} />
@@ -72,7 +84,7 @@ const App = () => {
         {/* 404 Route */}
         <Route path="*" element={<h1>404 - Page Not Found</h1>} />
       </Routes>
-    </>
+    </div>
   );
 };
 

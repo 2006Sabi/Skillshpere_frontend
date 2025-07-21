@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FiMenu, FiX, FiSun, FiMoon } from "react-icons/fi";
 import "../style/Navbar.css"; // Import the CSS file
-import logo from "../images/logo.jpg";
 
-const Navbar = () => {
+const Navbar = ({ theme, toggleTheme }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Manage login state
   const navigate = useNavigate(); // Hook for navigation
@@ -26,51 +26,66 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-left">
-        <img src={logo} alt="Logo" className="navbar-logo" />
+      <div className="navbar-container">
+        <div className="navbar-brand">
+          <Link to="/" className="brand-text">
+            SkillSphere
+          </Link>
+        </div>
+
+        <div className="navbar-menu">
+          <ul className={`navbar-links ${menuOpen ? "active" : ""}`}>
+            <li>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" onClick={() => setMenuOpen(false)}>
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/roadmaps" onClick={() => setMenuOpen(false)}>
+                Roadmaps
+              </Link>
+            </li>
+            <li>
+              <Link to="/courses" onClick={() => setMenuOpen(false)}>
+                Courses
+              </Link>
+            </li>
+            <li>
+              <Link to="/feedback" onClick={() => setMenuOpen(false)}>
+                Feedback
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div className="navbar-actions">
+          <button className="theme-toggle" onClick={toggleTheme}>
+            {theme === "light" ? <FiMoon /> : <FiSun />}
+          </button>
+
+          {!isLoggedIn ? (
+            <Link to="/login" className="btn btn-primary">
+              Login
+            </Link>
+          ) : (
+            <button onClick={handleLogout} className="btn btn-secondary">
+              Logout
+            </button>
+          )}
+        </div>
+
         <div
-          className="menu-toggle"
+          className="mobile-menu-toggle"
           onClick={() => setMenuOpen(!menuOpen)}
-        ></div>
+        >
+          {menuOpen ? <FiX /> : <FiMenu />}
+        </div>
       </div>
-
-      <ul className={`navbar-links ${menuOpen ? "open" : ""}`}>
-        <li>
-          <Link to="/" onClick={() => setMenuOpen(false)}>
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link to="/about" onClick={() => setMenuOpen(false)}>
-            About Us
-          </Link>
-        </li>
-        <li>
-          <Link to="/roadmaps" onClick={() => setMenuOpen(false)}>
-            Roadmaps
-          </Link>
-        </li>
-        <li>
-          <Link to="/courses" onClick={() => setMenuOpen(false)}>
-            Courses
-          </Link>
-        </li>
-        <li>
-          <Link to="/feedback" onClick={() => setMenuOpen(false)}>
-            Feedback
-          </Link>
-        </li>
-      </ul>
-
-      {!isLoggedIn ? (
-        <Link to="/login" className="cta-button">
-          Login
-        </Link>
-      ) : (
-        <button onClick={handleLogout} className="cta-button">
-          Logout
-        </button>
-      )}
     </nav>
   );
 };

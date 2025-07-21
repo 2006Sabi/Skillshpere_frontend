@@ -15,7 +15,7 @@ const Homepage = () => {
       // If not logged in, redirect to the register page
       console.log("Redirecting to register page...");
     }
-          navigate("/register");
+    navigate("/register");
 
     // If logged in, you can redirect elsewhere (add your own logic here if necessary)
   };

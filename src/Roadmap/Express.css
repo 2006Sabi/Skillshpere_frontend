@@ -1,15 +1,15 @@
 /* General Styles */
 mongodb-body {
-  background-color: white;
-  background-image: url('./mongodb.jpg'); /* Add the background image */
-  background-size: cover;  /* Ensure the image covers the whole body */
+  background-color: #f5f5f5;
+  background-image: url("./mongodb.jpg"); /* Add the background image */
+  background-size: cover; /* Ensure the image covers the whole body */
   background-position: center center; /* Position the image at the center */
   background-attachment: fixed; /* Keep the background fixed while scrolling */
 }
 
 .timeline2 h1 {
   text-decoration: dotted;
-  color: black;
+  color: #333;
   margin-left: 10%;
   padding: 50px;
   margin-top: 0%;
@@ -17,18 +17,18 @@ mongodb-body {
 }
 .text-box2 h2 {
   font-weight: 600;
-  color: white; /* Ensure the heading text is white */
+  color: #ffffff;
 }
 
 .text-box2 p {
-  color: white; /* Ensure paragraph text inside text-box is white */
+  color: #ffffff;
 }
 
 .timeline2 {
   position: relative;
   max-width: 1200px;
   margin: 100px auto;
-  color: black;
+  color: #333;
 }
 
 .container2 {
@@ -39,8 +39,8 @@ mongodb-body {
 
 .text-box2 {
   padding: 20px 30px;
-  background: black; /* Set the box color to black */
-  color: white; /* Set the text color to white */
+  background: #000000;
+  color: #ffffff;
   position: relative;
   border-radius: 30px;
   font-size: 25px;
@@ -56,21 +56,21 @@ mongodb-body {
   left: 52%;
 }
 .timeline2::after {
-  content: '';
+  content: "";
   position: absolute;
-  width: 6px; /* Adjust thickness */
-  height: 100%; /* Ensure it covers full timeline */
-  background: black; /* Adjust color if needed */
+  width: 6px;
+  height: 100%;
+  background: #000000;
   top: 200px;
   left: 47%;
   margin-left: 80px;
   transform: translateX(-50%);
-  z-index: 1; /* Ensure it appears behind elements */
+  z-index: 1;
 }
 
 .timeline2 {
   margin-top: 10px;
-  min-height: 100vh; /* Ensures enough space for the line */
+  min-height: 100vh;
   position: relative;
 }
 
@@ -86,21 +86,20 @@ mongodb-body {
   z-index: 1;
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
-  border-left: 15px solid black;
+  border-left: 15px solid #000000;
   right: -15px;
 }
 .left-container2 {
   left: 0;
   padding: 0.5px;
   margin-left: 1%;
-
 }
 
-.right-container2{
+.right-container2 {
   left: 52%;
 }
 
-.right-container2-arrow{
+.right-container2-arrow {
   height: 0;
   width: 0;
   position: absolute;
@@ -109,7 +108,7 @@ mongodb-body {
   left: 56%;
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
-  border-right: 15px solid black;
+  border-right: 15px solid #000000;
   left: -15px;
 }
 

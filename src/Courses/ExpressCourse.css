@@ -3,46 +3,52 @@
   margin: auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
 }
 
 h1 {
   text-align: center;
-  color: #d35400;
+  color: #333;
 }
 
 .express-section {
-  background-color: #f4f4f4;
+  background-color: #ffffff;
   padding: 15px;
   margin: 10px 0;
   border-radius: 5px;
+  border: 1px solid #e0e0e0;
 }
 
 .express-section h2 {
-  color: #e67e22;
+  color: #333;
 }
 
 .express-section p {
   font-size: 16px;
+  color: #666;
 }
 
 .express-section pre {
-  background-color: #222;
-  color: #fff;
+  background-color: #f0f0f0;
+  color: #333;
   padding: 10px;
   border-radius: 5px;
   overflow-x: auto;
+  border: 1px solid #ddd;
 }
 
 .express-section ul {
   list-style-type: square;
   padding-left: 20px;
+  color: #666;
 }
 
 .express-section ol {
   padding-left: 20px;
+  color: #666;
 }
 
 a {
-  color: #e67e22;
+  color: #000000;
   text-decoration: none;
 }

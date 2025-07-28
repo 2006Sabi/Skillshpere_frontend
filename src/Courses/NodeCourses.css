@@ -3,46 +3,52 @@
   margin: auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
 }
 
 h1 {
   text-align: center;
-  color: #2d89ef;
+  color: #333;
 }
 
 .node-section {
-  background-color: #f4f4f4;
+  background-color: #ffffff;
   padding: 15px;
   margin: 10px 0;
   border-radius: 5px;
+  border: 1px solid #e0e0e0;
 }
 
 .node-section h2 {
-  color: #007acc;
+  color: #333;
 }
 
 .node-section p {
   font-size: 16px;
+  color: #666;
 }
 
 .node-section pre {
-  background-color: #222;
-  color: #fff;
+  background-color: #f0f0f0;
+  color: #333;
   padding: 10px;
   border-radius: 5px;
   overflow-x: auto;
+  border: 1px solid #ddd;
 }
 
 .node-section ul {
   list-style-type: square;
   padding-left: 20px;
+  color: #666;
 }
 
 .node-section ol {
   padding-left: 20px;
+  color: #666;
 }
 
 a {
-  color: #007acc;
+  color: #000000;
   text-decoration: none;
 }

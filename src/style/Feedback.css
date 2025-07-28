@@ -1,7 +1,7 @@
 /* Feedback Section */
 .feedback-section {
   padding: 6rem 2rem;
-  background: #f8f9fa;
+  background: #f5f5f5;
   text-align: center;
 }
 
@@ -13,28 +13,30 @@
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   animation: fadeIn 1s ease-in-out;
+  border: 1px solid #e0e0e0;
 }
 
 .feedback-container h2 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #333;
   margin-bottom: 1rem;
 }
 
 .feedback-container p {
   font-size: 1.1rem;
-  color: #7f8c8d;
+  color: #666;
   margin-bottom: 3rem;
 }
 
 .success-message {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: #f0f0f0;
+  color: #333;
   padding: 1.5rem;
   border-radius: 10px;
   font-size: 1.2rem;
   font-weight: 500;
+  border: 1px solid #000000;
 }
 
 .feedback-form {
@@ -47,7 +49,7 @@
 .feedback-form label {
   font-size: 1rem;
   font-weight: 600;
-  color: #34495e;
+  color: #333;
 }
 
 .feedback-form input,
@@ -55,20 +57,21 @@
 .feedback-form textarea {
   width: 100%;
   padding: 1rem;
-  border: 1px solid #dcdfe6;
+  border: 1px solid #ddd;
   border-radius: 10px;
   font-size: 1rem;
-  color: #2c3e50;
+  color: #333;
   transition: all 0.3s ease;
   box-sizing: border-box;
+  background-color: #ffffff;
 }
 
 .feedback-form input:focus,
 .feedback-form select:focus,
 .feedback-form textarea:focus {
   outline: none;
-  border-color: #764ba2;
-  box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.2);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .feedback-form textarea {
@@ -77,7 +80,7 @@
 }
 
 .feedback-form button {
-  background: linear-gradient(45deg, #ff8a00, #e52e71);
+  background: linear-gradient(45deg, #000000, #333333);
   color: #fff;
   font-size: 1.1rem;
   font-weight: 600;
@@ -91,6 +94,96 @@
 .feedback-form button:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Testimonial Cards */
+.testimonial-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-8);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  position: relative;
+}
+
+[data-theme="dark"] .testimonial-card {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+}
+
+.testimonial-card::before {
+  content: '"';
+  position: absolute;
+  top: var(--spacing-4);
+  left: var(--spacing-6);
+  font-size: var(--font-size-6xl);
+  color: var(--primary-200);
+  font-family: serif;
+  line-height: 1;
+}
+
+[data-theme="dark"] .testimonial-card::before {
+  color: var(--primary-800);
+}
+
+.testimonial-content {
+  margin-bottom: var(--spacing-6);
+  font-style: italic;
+  color: var(--gray-700);
+  line-height: 1.6;
+}
+
+[data-theme="dark"] .testimonial-content {
+  color: var(--gray-300);
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.author-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--primary-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-600);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .author-avatar {
+  background: var(--primary-900);
+  color: var(--primary-400);
+}
+
+.author-info h4 {
+  margin-bottom: var(--spacing-1);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .author-info h4 {
+  color: var(--gray-100);
+}
+
+.author-info p {
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+[data-theme="dark"] .author-info p {
+  color: var(--gray-400);
+}
+
+/* Responsive Design for Testimonials */
+@media (max-width: 768px) {
+  .testimonial-card {
+    margin-bottom: var(--spacing-6);
+  }
 }
 
 @media (max-width: 768px) {

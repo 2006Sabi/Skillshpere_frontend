@@ -1,12 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Code, BookOpen, Rocket, Users, Star, ArrowRight, CheckCircle, Play } from 'lucide-react';
+import PricingSection from './PricingSection';
 
 const LandingPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
     setIsVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['features', 'about', 'pricing'];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const features = [
@@ -57,7 +82,7 @@ const LandingPage: React.FC = () => {
                 <Code className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                StackBuilder
+                Skillsphere
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -197,6 +222,124 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              About <span className="text-indigo-600">Skillsphere</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              We're on a mission to democratize full-stack development education by providing 
+              accessible, practical, and industry-relevant learning experiences.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="space-y-8">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Star className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Founded by Industry Experts
+                    </h3>
+                    <p className="text-gray-600">
+                      Created by senior developers from top tech companies who understand exactly 
+                      what skills are needed to succeed in today's market.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Users className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Community-Driven Approach
+                    </h3>
+                    <p className="text-gray-600">
+                      Learn alongside 10,000+ active developers in our supportive community. 
+                      Get help, share knowledge, and grow together.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-6 h-6 text-pink-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Proven Track Record
+                    </h3>
+                    <p className="text-gray-600">
+                      95% of our students land their dream jobs within 6 months of completion, 
+                      with starting salaries averaging $75,000+.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+                    <div className="text-3xl font-bold text-indigo-600 mb-1">50+</div>
+                    <div className="text-sm text-gray-600">Expert Instructors</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+                    <div className="text-3xl font-bold text-purple-600 mb-1">1000+</div>
+                    <div className="text-sm text-gray-600">Hours of Content</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+                    <div className="text-3xl font-bold text-pink-600 mb-1">25+</div>
+                    <div className="text-sm text-gray-600">Countries Reached</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 text-center shadow-sm">
+                    <div className="text-3xl font-bold text-green-600 mb-1">4.9/5</div>
+                    <div className="text-sm text-gray-600">Student Rating</div>
+                  </div>
+                </div>
+                
+                <div className="bg-white rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold text-gray-900 mb-3">Our Philosophy</h4>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    "We believe that anyone can become a great developer with the right guidance, 
+                    practical experience, and supportive community. Our hands-on approach ensures 
+                    you don't just learn concepts – you build real applications that showcase your skills."
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16 text-center">
+            <div className="inline-flex items-center space-x-8 text-sm text-gray-500">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Trusted by 500+ Companies</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span>ISO 27001 Certified</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <span>GDPR Compliant</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
+
       {/* Learning Path Preview */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-indigo-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -261,7 +404,7 @@ const LandingPage: React.FC = () => {
             Ready to start your journey?
           </h2>
           <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who have transformed their careers with StackBuilder. 
+            Join thousands of developers who have transformed their careers with Skillsphere. 
             Start learning today with our free tier.
           </p>
           
@@ -291,7 +434,7 @@ const LandingPage: React.FC = () => {
                 <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <Code className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold">StackBuilder</span>
+                <span className="text-2xl font-bold">Skillsphere</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 Empowering developers worldwide with comprehensive MERN stack education 
@@ -332,7 +475,7 @@ const LandingPage: React.FC = () => {
           </div>
           
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 StackBuilder. All rights reserved. Built with ❤️ for developers.</p>
+            <p>&copy; 2025 Skillsphere. All rights reserved. Built with ❤️ for developers.</p>
           </div>
         </div>
       </footer>

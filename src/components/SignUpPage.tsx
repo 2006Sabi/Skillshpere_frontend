@@ -92,40 +92,43 @@ const SignUpPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors({});
 
-    // Simulate API call
-    setTimeout(() => {
-      // Save authentication data to localStorage
-      const authData = {
-        isAuthenticated: true,
-        userId: generateId(),
-        username: formData.username,
-        loginTime: new Date().toISOString(),
-        sessionToken: generateId()
-      };
-      
-      saveAuthData(authData);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          bio: formData.bio,
+          city: formData.city,
+          country: formData.country,
+          phone: formData.phone,
+        }),
+      });
 
-      // Create user profile
-      const userProfile = {
-        id: authData.userId,
-        username: formData.username,
-        email: formData.email,
-        fullName: `${formData.firstName} ${formData.lastName}`,
-        bio: formData.bio || 'New StackBuilder learner',
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.username}`,
-        joinedDate: new Date().toISOString(),
-        skills: [],
-        completedCourses: [],
-        currentProjects: [],
-        achievements: []
-      };
-      
-      saveUserProfile(userProfile);
-      
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      // Save authentication token to localStorage
+      localStorage.setItem('authToken', data.token);
+
       setIsLoading(false);
       navigate('/dashboard');
-    }, 2000);
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setErrors({ email: err.message });
+      setIsLoading(false);
+    }
   };
 
   const steps = [

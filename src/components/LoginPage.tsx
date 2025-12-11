@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, User, Code, ArrowLeft } from 'lucide-react';
-import { saveAuthData, generateId, saveUserProfile } from '../utils/localStorage';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Lock, User, Code, ArrowLeft } from "lucide-react";
+import {
+  saveAuthData,
+  generateId,
+  saveUserProfile,
+} from "../utils/localStorage";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -12,14 +16,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
   const [errors, setErrors] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,20 +32,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   const validateForm = () => {
     const newErrors = {
-      username: '',
-      password: ''
+      username: "",
+      password: "",
     };
 
     if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+      newErrors.username = "Username is required";
     } else if (formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
+      newErrors.username = "Username must be at least 3 characters";
     }
 
     if (!formData.password.trim()) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -50,61 +54,65 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
+    setErrors({ username: "", password: "" });
 
-    // Simulate API call
-    setTimeout(() => {
-      // Save authentication data to localStorage
-      const authData = {
-        isAuthenticated: true,
-        userId: generateId(),
-        username: formData.username,
-        loginTime: new Date().toISOString(),
-        sessionToken: generateId()
-      };
-      
-      saveAuthData(authData);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usernameOrEmail: formData.username,
+          password: formData.password,
+        }),
+      });
 
-      // Create or update user profile
-      const userProfile = {
-        id: authData.userId,
-        username: formData.username,
-        email: `${formData.username}@example.com`,
-        fullName: formData.username,
-        bio: 'New StackBuilder learner',
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.username}`,
-        joinedDate: new Date().toISOString(),
-        skills: [],
-        completedCourses: [],
-        currentProjects: [],
-        achievements: []
-      };
-      
-      saveUserProfile(userProfile);
-      
+      if (!res.ok) {
+        const text = await res.text();
+        let errorMessage = "Login failed";
+        try {
+          const data = JSON.parse(text);
+          errorMessage = data.message || errorMessage;
+        } catch (e) {
+          errorMessage = text || "Server error";
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await res.json();
+
+      // Save authentication token to localStorage
+      localStorage.setItem("authToken", data.token);
+
       setIsLoading(false);
       onLogin();
-      navigate('/dashboard');
-    }, 1500);
+      navigate("/dashboard");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setErrors({ username: err.message, password: "" });
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -114,13 +122,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
       </div>
 
       <div className="relative w-full max-w-md">
         {/* Back to home button */}
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors mb-8 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -128,16 +139,24 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         </Link>
 
         {/* Login form */}
-        <div className={`bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
-        }`}>
+        <div
+          className={`bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 transition-all duration-700 ${
+            isVisible
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-8 scale-95"
+          }`}
+        >
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Code className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-            <p className="text-gray-600">Sign in to continue your learning journey</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome Back
+            </h1>
+            <p className="text-gray-600">
+              Sign in to continue your learning journey
+            </p>
           </div>
 
           {/* Form */}
@@ -157,9 +176,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   value={formData.username}
                   onChange={handleInputChange}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                    errors.username 
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                      : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                    errors.username
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
                   }`}
                   placeholder="Enter your username"
                   disabled={isLoading}
@@ -183,14 +202,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                    errors.password 
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                      : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                    errors.password
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
                   }`}
                   placeholder="Enter your password"
                   disabled={isLoading}
@@ -226,11 +245,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   disabled={isLoading}
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Remember me
                 </label>
               </div>
-              <a href="#" className="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
+              <a
+                href="#"
+                className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+              >
                 Forgot password?
               </a>
             </div>
@@ -262,7 +287,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -290,9 +317,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           {/* Sign up link */}
           <div className="text-center mt-8">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link 
-                to="/signup" 
+              Don't have an account?{" "}
+              <Link
+                to="/signup"
                 className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
               >
                 Sign up for free
@@ -303,10 +330,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         {/* Demo credentials */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-blue-800 mb-2">Demo Credentials</h4>
+          <h4 className="text-sm font-semibold text-blue-800 mb-2">
+            Demo Credentials
+          </h4>
           <p className="text-xs text-blue-700">
-            Username: <span className="font-mono bg-blue-100 px-1 rounded">demo</span> | 
-            Password: <span className="font-mono bg-blue-100 px-1 rounded">demo123</span>
+            Username:{" "}
+            <span className="font-mono bg-blue-100 px-1 rounded">demo</span> |
+            Password:{" "}
+            <span className="font-mono bg-blue-100 px-1 rounded">demo123</span>
           </p>
         </div>
       </div>

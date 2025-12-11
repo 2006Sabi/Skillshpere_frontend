@@ -36,7 +36,7 @@ const LandingPage: React.FC = () => {
 
   const features = [
     {
-      icon: <BookOpen className="w-8 h-8" />,
+      icon: <BookOpen className="w- h-8" />,
       title: "Structured Learning Path",
       description: "Follow our carefully crafted MERN stack roadmap with step-by-step guidance and hands-on projects."
     },
@@ -58,8 +58,8 @@ const LandingPage: React.FC = () => {
   ];
 
   const stats = [
-    { number: "10K+", label: "Active Learners" },
-    { number: "50+", label: "Practice Projects" },
+    { number: "10", label: "Active Learners" },
+    { number: "50", label: "Practice Projects" },
     { number: "95%", label: "Success Rate" },
     { number: "24/7", label: "Support Available" }
   ];
@@ -112,11 +112,6 @@ const LandingPage: React.FC = () => {
           <div className={`text-center transition-all duration-1000 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
-            <div className="mb-8">
-              <span className="bg-indigo-100 text-indigo-600 px-4 py-2 rounded-full text-sm font-medium">
-                🚀 New: Advanced React Patterns Course Available
-              </span>
-            </div>
             
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               Master the{' '}
@@ -140,12 +135,6 @@ const LandingPage: React.FC = () => {
                 <span>Start Learning Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="group flex items-center space-x-3 px-8 py-4 text-gray-700 hover:text-indigo-600 transition-colors">
-                <div className="w-12 h-12 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center group-hover:border-indigo-300 transition-colors">
-                  <Play className="w-5 h-5 ml-1" />
-                </div>
-                <span className="font-semibold">Watch Demo</span>
-              </button>
             </div>
 
             {/* Technology Stack */}
@@ -189,7 +178,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+      <section id="features" className="py-5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -223,7 +212,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section id="about" className="py-5 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -317,23 +306,6 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          <div className="mt-16 text-center">
-            <div className="inline-flex items-center space-x-8 text-sm text-gray-500">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Trusted by 500+ Companies</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>ISO 27001 Certified</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span>GDPR Compliant</span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -341,7 +313,7 @@ const LandingPage: React.FC = () => {
       <PricingSection />
 
       {/* Learning Path Preview */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-indigo-50 px-4 sm:px-6 lg:px-8">
+      <section className="py-1 bg-gradient-to-br from-gray-50 to-indigo-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -414,12 +386,6 @@ const LandingPage: React.FC = () => {
               className="bg-white text-indigo-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-colors transform hover:scale-105"
             >
               Start Free Trial
-            </Link>
-            <Link 
-              to="/login"
-              className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-colors"
-            >
-              Sign In
             </Link>
           </div>
         </div>

@@ -216,17 +216,6 @@ const PricingSection: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Money Back Guarantee */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-semibold">30-Day Money Back Guarantee</span>
-          </div>
-          <p className="text-gray-600 mt-4">
-            Not satisfied? Get a full refund within 30 days, no questions asked.
-          </p>
-        </div>
       </div>
     </section>
   );

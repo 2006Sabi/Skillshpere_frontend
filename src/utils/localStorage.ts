@@ -9,12 +9,14 @@ export interface UserProfile {
   email: string;
   fullName: string;
   bio: string;
-  avatar: string;
+  avatar: string | null;
   joinedDate: string;
   skills: string[];
   completedCourses: string[];
   currentProjects: string[];
   achievements: string[];
+  role?: "user" | "admin";
+  skillLevel?: string;
 }
 
 export interface Course {
@@ -156,7 +158,7 @@ export const setAuthToken = (
     if (existingRaw) {
       try {
         existing = JSON.parse(existingRaw) as Partial<AuthData>;
-      } catch {}
+      } catch { }
     }
     const now = new Date().toISOString();
     const authData: AuthData = {
@@ -373,11 +375,11 @@ export const isUserAuthenticated = (): boolean => {
 export interface Activity {
   id: string;
   type:
-    | "course_completed"
-    | "project_created"
-    | "milestone_achieved"
-    | "login"
-    | "profile_updated";
+  | "course_completed"
+  | "project_created"
+  | "milestone_achieved"
+  | "login"
+  | "profile_updated";
   title: string;
   description: string;
   timestamp: string;

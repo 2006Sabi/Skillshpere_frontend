@@ -1,7 +1,11 @@
 // src/components/ProfilePage.tsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuthToken, clearAuthToken } from "../utils/localStorage";
+import {
+  getAuthToken,
+  clearAuthToken,
+  saveUserProfile,
+} from "../utils/localStorage";
 
 type ProfileState = {
   firstName: string;
@@ -15,7 +19,8 @@ type ProfileState = {
   joinedDate: string;
   completedProjects: number;
   skillLevel: string;
-  avatarUrl?: string | null;
+  completedCourses: number;
+  profileCompletion: number;
 };
 
 const emptyProfile: ProfileState = {
@@ -30,26 +35,36 @@ const emptyProfile: ProfileState = {
   joinedDate: "",
   completedProjects: 0,
   skillLevel: "Beginner",
-  avatarUrl: null,
+  completedCourses: 0,
+  profileCompletion: 0,
 };
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || "";
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
+
+  const calculateCompletion = (data: any) => {
+    const fields = [
+      "firstName",
+      "lastName",
+      "username",
+      "email",
+      "phone",
+      "city",
+      "country",
+      "bio",
+      "skillLevel",
+    ];
+    const filled = fields.filter((field) => data[field] && data[field].toString().trim() !== "").length;
+    return Math.round((filled / fields.length) * 100);
+  };
   const [isVisible, setIsVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState<ProfileState>(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // local preview for avatar file chosen by user
-  const [localAvatarPreview, setLocalAvatarPreview] = useState<string | null>(
-    null
-  );
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const authToken = () => getAuthToken();
 
@@ -76,7 +91,6 @@ const ProfilePage: React.FC = () => {
       }
 
       if (!res.ok) {
-        // try to parse JSON body, otherwise throw generic
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.message || "Failed to fetch profile");
       }
@@ -97,11 +111,9 @@ const ProfilePage: React.FC = () => {
           : "",
         completedProjects: user.completedProjects ?? 0,
         skillLevel: user.skillLevel || "Beginner",
-        avatarUrl: user.avatar || user.avatarUrl || null,
+        completedCourses: user.completedCourses?.length || 0,
+        profileCompletion: calculateCompletion(user),
       });
-
-      // clear preview on load (if any)
-      setLocalAvatarPreview(null);
     } catch (err: any) {
       if (err.name === "AbortError") return;
       console.error("Profile load error:", err);
@@ -193,8 +205,45 @@ const ProfilePage: React.FC = () => {
         country: updated.country || prev.country,
         bio: updated.bio || prev.bio,
         skillLevel: updated.skillLevel || prev.skillLevel,
-        avatarUrl: updated.avatar || updated.avatarUrl || prev.avatarUrl,
+        completedCourses: prev.completedCourses,
+        profileCompletion: calculateCompletion({
+          ...prev,
+          ...updated,
+        }),
       }));
+
+      // Update localStorage and notify MainLayout
+      const fullProfileForStorage: any = {
+        id: updated.id,
+        username: updated.username || profileData.username,
+        email: updated.email || profileData.email,
+        firstName: updated.firstName || profileData.firstName,
+        lastName: updated.lastName || profileData.lastName,
+        fullName: `${updated.firstName || profileData.firstName} ${updated.lastName || profileData.lastName || ""
+          }`.trim(),
+        bio: updated.bio || profileData.bio,
+        avatar: updated.avatarUrl || null,
+        joinedDate: updated.createdAt,
+        skills: updated.skills || [],
+        completedCourses: updated.completedCourses || [],
+        currentProjects: [],
+        achievements: [],
+        skillLevel: updated.skillLevel || profileData.skillLevel,
+        // completedCourses: defined above as array, do not overwrite with number
+        profileCompletion: calculateCompletion({
+          ...profileData,
+          ...updated
+        }),
+      };
+
+      saveUserProfile(fullProfileForStorage);
+
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "userProfile",
+          newValue: JSON.stringify(fullProfileForStorage),
+        })
+      );
 
       setIsEditing(false);
     } catch (err: any) {
@@ -216,228 +265,47 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  // Avatar file selected -> preview & optionally upload
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // preview
-    const url = URL.createObjectURL(file);
-    setLocalAvatarPreview(url);
-
-    // optionally auto-upload or user can click 'Upload Avatar' button
-  };
-
-  // Upload avatar to server
-  const handleAvatarUpload = async () => {
-    const token = authToken();
-    if (!token) {
-      clearAuthToken();
-      navigate("/login");
-      return;
-    }
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
-      setError("Please choose an image file first.");
-      return;
-    }
-
-    setUploadingAvatar(true);
-    setError(null);
-    try {
-      const fd = new FormData();
-      fd.append("avatar", file);
-
-      const res = await fetch(`${API_BASE}/api/users/me/avatar`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // DO NOT set Content-Type here — browser will set the boundary
-        },
-        body: fd,
-      });
-
-      if (res.status === 401) {
-        clearAuthToken();
-        navigate("/login");
-        return;
-      }
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.message || "Upload failed");
-      }
-
-      const body = await res.json();
-      // server returns { avatarUrl: '/uploads/...' , user: {...} } or user
-      const avatarUrl =
-        body.avatarUrl || body.user?.avatar || body.user?.avatarUrl;
-
-      setProfileData((prev) => ({
-        ...prev,
-        avatarUrl: avatarUrl ?? prev.avatarUrl ?? null,
-      }));
-
-      // clear preview & file input
-      setLocalAvatarPreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (err: any) {
-      console.error("avatar upload error:", err);
-      setError(err.message || "Avatar upload failed");
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
-
-  const handleRemoveAvatar = async () => {
-    // This relies on backend supporting removing avatar (PUT /api/users/me with avatar: null)
-    const token = authToken();
-    if (!token) {
-      clearAuthToken();
-      navigate("/login");
-      return;
-    }
-    setSaving(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/users/me`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ avatar: null }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.message || "Failed to remove avatar");
-      }
-      const updated = await res.json();
-      setProfileData((prev) => ({
-        ...prev,
-        avatarUrl: updated.avatar || null,
-      }));
-      setLocalAvatarPreview(null);
-    } catch (err: any) {
-      console.error("remove avatar error:", err);
-      setError(err.message || "Failed to remove avatar");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // UI styles (kept close to your design)
+  // styles (kept simple and consistent)
   const styles: { [k: string]: React.CSSProperties } = {
-    page: { maxWidth: 1100, margin: "24px auto", padding: 20 },
+    page: { maxWidth: 1000, margin: "24px auto", padding: 20 },
     card: {
       display: "grid",
-      gridTemplateColumns: "320px 1fr",
-      gap: 28,
-      background: "linear-gradient(180deg, rgba(255,255,255,0.98), #fff)",
-      borderRadius: 16,
-      padding: 28,
-      boxShadow: "0 18px 40px rgba(13,17,35,0.08)",
-      border: "1px solid rgba(99,102,241,0.08)",
-      transform: isVisible
-        ? "translateY(0) scale(1)"
-        : "translateY(18px) scale(0.995)",
-      opacity: isVisible ? 1 : 0,
-    },
-    leftPanel: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 18,
-      alignItems: "center",
-    },
-    avatarWrap: {
-      width: 140,
-      height: 140,
-      borderRadius: 20,
-      overflow: "hidden",
-      position: "relative" as const,
-    },
-    avatar: {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover" as const,
-      display: "block",
-      background: "linear-gradient(135deg,#6d28d9,#7c3aed)",
-      color: "white",
-      fontSize: 40,
-      fontWeight: 800,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarButtons: { display: "flex", gap: 8, marginTop: 10 },
-    name: {
-      fontSize: 22,
-      fontWeight: 800,
-      color: "#0f172a",
-      textAlign: "center" as const,
-    },
-    handle: {
-      color: "#6d28d9",
-      fontWeight: 700,
-      marginTop: 6,
-      textAlign: "center" as const,
-    },
-    joinedText: {
-      color: "#64748b",
-      fontSize: 13,
-      marginTop: 6,
-      textAlign: "center" as const,
-    },
-    statStrip: {
-      display: "flex",
-      gap: 12,
-      width: "100%",
-      justifyContent: "space-between",
-      marginTop: 6,
-      flexWrap: "wrap" as const,
-    },
-    statItem: {
-      flex: "1 1 48%",
-      minWidth: 120,
-      background:
-        "linear-gradient(90deg, rgba(103,58,183,0.06), rgba(99,102,241,0.03))",
+      gridTemplateColumns: "1fr",
+      gap: 24,
+      background: "#fff",
       borderRadius: 12,
-      padding: 12,
-      textAlign: "center" as const,
-      border: "1px solid rgba(99,102,241,0.06)",
+      padding: 20,
+      boxShadow: "0 10px 30px rgba(2,6,23,0.06)",
+      border: "1px solid #eef2ff",
+      transform: isVisible ? "translateY(0)" : "translateY(8px)",
+      opacity: isVisible ? 1 : 0,
+      transition: "all 0.5s ease",
     },
-    statNumber: { fontSize: 18, fontWeight: 800, color: "#4c1d95" },
-    statLabel: {
-      fontSize: 12,
-      color: "#475569",
-      marginTop: 6,
-      fontWeight: 600,
+    headerRow: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 12,
     },
-    rightPanel: { display: "flex", flexDirection: "column", gap: 16 },
+    title: { margin: 0, fontSize: 20, fontWeight: 800, color: "#0f172a" },
+    subtitle: { color: "#94a3b8", fontSize: 13 },
     section: {
       background: "#fff",
       borderRadius: 12,
       padding: 18,
       border: "1px solid #eef2ff",
-      boxShadow: "0 8px 20px rgba(13,17,35,0.03)",
     },
-    sectionTitleRow: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 12,
-    },
-    sectionTitle: { fontSize: 16, fontWeight: 700, color: "#0f172a" },
     formGrid: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
       gap: 12,
     },
     label: {
-      fontSize: 13,
-      color: "#334155",
-      fontWeight: 700,
-      marginBottom: 6,
       display: "block",
+      marginBottom: 6,
+      fontWeight: 700,
+      color: "#334155",
+      fontSize: 13,
     },
     input: {
       width: "100%",
@@ -497,7 +365,6 @@ const ProfilePage: React.FC = () => {
       fontWeight: 700,
       cursor: "pointer",
     },
-    hint: { fontSize: 13, color: "#94a3b8" },
     errorBox: {
       background: "#fff7f7",
       color: "#9b2c2c",
@@ -506,14 +373,29 @@ const ProfilePage: React.FC = () => {
       borderRadius: 8,
       fontWeight: 600,
     },
-    smallMuted: { fontSize: 12, color: "#94a3b8" },
+    statsGrid: { display: "flex", gap: 12, flexWrap: "wrap" as const },
+    statCard: {
+      flex: "1 1 140px",
+      background: "#fbfbff",
+      padding: 12,
+      borderRadius: 8,
+      textAlign: "center" as const,
+      border: "1px solid #eef2ff",
+    },
+    statNumber: { fontSize: 18, fontWeight: 800, color: "#4c1d95" },
+    statLabel: {
+      fontSize: 12,
+      color: "#475569",
+      marginTop: 6,
+      fontWeight: 600,
+    },
   };
 
   const stats = [
     { number: String(profileData.completedProjects ?? 0), label: "Projects" },
     { number: profileData.skillLevel, label: "Skill Level" },
-    { number: "12", label: "Courses" },
-    { number: "85%", label: "Progress" },
+    { number: String(profileData.completedCourses ?? 0), label: "Courses" },
+    { number: `${profileData.profileCompletion}%`, label: "Progress" },
   ];
 
   if (loading) {
@@ -549,324 +431,213 @@ const ProfilePage: React.FC = () => {
   return (
     <div style={styles.page}>
       <div style={styles.card as React.CSSProperties}>
-        {/* LEFT */}
-        <div style={styles.leftPanel}>
-          <div style={styles.avatarWrap}>
-            {localAvatarPreview ? (
-              <img
-                src={localAvatarPreview}
-                alt="Avatar preview"
-                style={styles.avatar}
-              />
-            ) : profileData.avatarUrl ? (
-              // If avatarUrl is absolute it shows; if relative ("/uploads/..") it will work with proxy/static
-              <img
-                src={profileData.avatarUrl}
-                alt="Avatar"
-                style={styles.avatar}
-              />
+        <div style={styles.headerRow}>
+          <div>
+            <h1 style={styles.title}>Profile</h1>
+            <div style={styles.subtitle}>
+              Manage your personal information and account details
+            </div>
+          </div>
+
+          <div style={styles.toolbar}>
+            {!isEditing ? (
+              <button
+                style={styles.editButton}
+                onClick={() => setIsEditing(true)}
+              >
+                Edit Profile
+              </button>
             ) : (
-              <div style={styles.avatar}>
-                {(
-                  (profileData.firstName?.[0] ||
-                    profileData.username?.[0] ||
-                    "U") + (profileData.lastName?.[0] || "")
-                ).toUpperCase()}
-              </div>
+              <>
+                <button
+                  style={{ ...styles.saveButton, opacity: saving ? 0.85 : 1 }}
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save"}
+                </button>
+                <button
+                  style={styles.cancelButton}
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+              </>
             )}
           </div>
+        </div>
 
-          <div style={styles.avatarButtons}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              style={{ display: "none" }}
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                padding: "8px 12px",
-                borderRadius: 8,
-                background: "#eef2ff",
-                border: "1px solid rgba(99,102,241,0.08)",
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-            >
-              Choose Image
-            </button>
-          </div>
+        {error && <div style={styles.errorBox}>{error}</div>}
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              onClick={handleRemoveAvatar}
-              style={{
-                padding: "6px 10px",
-                borderRadius: 8,
-                background: "#fff1f2",
-                border: "1px solid #ffdddd",
-                cursor: "pointer",
-                color: "#ef4444",
-                fontWeight: 700,
-              }}
-            >
-              Remove
-            </button>
-          </div>
-
-          <div>
-            <div style={styles.name}>
-              {profileData.firstName || "Unnamed"} {profileData.lastName || ""}
+        <div style={styles.section}>
+          <div
+            style={{
+              marginBottom: 12,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ fontWeight: 800, color: "#0f172a" }}>
+              Personal Information
             </div>
-            <div style={styles.handle}>@{profileData.username || "user"}</div>
-            <div style={styles.joinedText}>
-              Member since {profileData.joinedDate || "—"}
+            <div style={{ color: "#94a3b8", fontSize: 13 }}>
+              {isEditing ? "Editing mode" : "Read only"}
             </div>
           </div>
 
-          <div style={styles.statStrip}>
-            {stats.map((s, i) => (
-              <div key={i} style={styles.statItem}>
-                <div style={styles.statNumber}>{s.number}</div>
-                <div style={styles.statLabel}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ width: "100%", marginTop: 6 }}>
-            <div
-              style={{
-                fontSize: 13,
-                color: "#475569",
-                fontWeight: 700,
-                marginBottom: 8,
-              }}
-            >
-              Contact
+          <div style={styles.formGrid}>
+            <div>
+              <label style={styles.label}>First name</label>
+              <input
+                name="firstName"
+                value={profileData.firstName}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
             </div>
-            <div style={{ fontSize: 13, color: "#334155" }}>
-              <div>
-                <strong>Email:</strong> {profileData.email || "—"}
-              </div>
-              <div style={{ marginTop: 6 }}>
-                <strong>Phone:</strong> {profileData.phone || "—"}
-              </div>
-              <div style={{ marginTop: 6 }}>
-                <strong>Location:</strong> {profileData.city || "—"},{" "}
-                {profileData.country || "—"}
-              </div>
+
+            <div>
+              <label style={styles.label}>Last name</label>
+              <input
+                name="lastName"
+                value={profileData.lastName}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
+            </div>
+
+            <div>
+              <label style={styles.label}>Username</label>
+              <input
+                name="username"
+                value={profileData.username}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
+            </div>
+
+            <div>
+              <label style={styles.label}>Email</label>
+              <input
+                name="email"
+                type="email"
+                value={profileData.email}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
+            </div>
+
+            <div>
+              <label style={styles.label}>Phone</label>
+              <input
+                name="phone"
+                value={profileData.phone}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
+            </div>
+
+            <div>
+              <label style={styles.label}>City</label>
+              <input
+                name="city"
+                value={profileData.city}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
+            </div>
+
+            <div>
+              <label style={styles.label}>Country</label>
+              <input
+                name="country"
+                value={profileData.country}
+                onChange={handleInputChange}
+                style={isEditing ? styles.input : styles.inputReadonly}
+                readOnly={!isEditing}
+              />
+            </div>
+
+            <div>
+              <label style={styles.label}>Skill Level</label>
+              <input
+                name="skillLevel"
+                value={profileData.skillLevel}
+                onChange={handleInputChange}
+                style={
+                  isEditing
+                    ? styles.input
+                    : { ...styles.inputReadonly, textTransform: "capitalize" }
+                }
+                readOnly={!isEditing}
+              />
             </div>
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div style={styles.rightPanel}>
-          {/* top toolbar */}
+        <div style={styles.section}>
+          <div
+            style={{
+              marginBottom: 12,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ fontWeight: 800, color: "#0f172a" }}>About</div>
+            <div style={{ color: "#94a3b8", fontSize: 13 }}>
+              Tell visitors about yourself
+            </div>
+          </div>
+
+          <textarea
+            name="bio"
+            value={profileData.bio}
+            onChange={handleInputChange}
+            style={
+              isEditing
+                ? styles.textarea
+                : {
+                  ...styles.textarea,
+                  background: "#fbfbff",
+                  border: "1px dashed transparent",
+                  color: "#64748b",
+                }
+            }
+            readOnly={!isEditing}
+          />
+
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
-              gap: 12,
-              alignItems: "center",
+              marginTop: 12,
             }}
           >
-            <div>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: "#0f172a",
-                }}
-              >
-                Profile
-              </h2>
-              <div style={{ color: "#94a3b8", fontSize: 13, marginTop: 4 }}>
-                Manage your personal information and account details
-              </div>
+            <div style={{ fontSize: 13, color: "#94a3b8" }}>
+              Tip: write a short summary of your skills and goals.
             </div>
-
-            <div style={styles.toolbar}>
-              {!isEditing ? (
-                <button
-                  style={styles.editButton}
-                  onClick={() => setIsEditing(true)}
-                >
-                  Edit Profile
-                </button>
-              ) : (
-                <>
-                  <button
-                    style={{
-                      ...styles.saveButton,
-                      opacity: saving ? 0.8 : 1,
-                      cursor: saving ? "not-allowed" : "pointer",
-                    }}
-                    onClick={handleSave}
-                    disabled={saving}
-                  >
-                    {saving ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    style={styles.cancelButton}
-                    onClick={handleCancel}
-                    disabled={saving}
-                  >
-                    Cancel
-                  </button>
-                </>
-              )}
+            <div style={{ color: "#94a3b8", fontSize: 13 }}>
+              Member since {profileData.joinedDate || "—"}
             </div>
           </div>
+        </div>
 
-          {error && <div style={styles.errorBox}>{error}</div>}
-
-          <div style={styles.section}>
-            <div style={styles.sectionTitleRow}>
-              <div style={styles.sectionTitle}>Personal Information</div>
-              <div style={{ color: "#94a3b8", fontSize: 13 }}>
-                {isEditing ? "Editing mode" : "Read only"}
-              </div>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          {stats.map((s, i) => (
+            <div key={i} style={styles.statCard}>
+              <div style={styles.statNumber}>{s.number}</div>
+              <div style={styles.statLabel}>{s.label}</div>
             </div>
-
-            <div style={styles.formGrid}>
-              <div>
-                <label style={styles.label}>First name</label>
-                <input
-                  name="firstName"
-                  value={profileData.firstName}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Last name</label>
-                <input
-                  name="lastName"
-                  value={profileData.lastName}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Username</label>
-                <input
-                  name="username"
-                  value={profileData.username}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Email</label>
-                <input
-                  name="email"
-                  value={profileData.email}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                  type="email"
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Phone</label>
-                <input
-                  name="phone"
-                  value={profileData.phone}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>City</label>
-                <input
-                  name="city"
-                  value={profileData.city}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Country</label>
-                <input
-                  name="country"
-                  value={profileData.country}
-                  onChange={handleInputChange}
-                  style={isEditing ? styles.input : styles.inputReadonly}
-                  readOnly={!isEditing}
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Skill Level</label>
-                <input
-                  name="skillLevel"
-                  value={profileData.skillLevel}
-                  onChange={handleInputChange}
-                  style={
-                    isEditing
-                      ? styles.input
-                      : { ...styles.inputReadonly, textTransform: "capitalize" }
-                  }
-                  readOnly={!isEditing}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div style={styles.section}>
-            <div style={styles.sectionTitleRow}>
-              <div style={styles.sectionTitle}>About</div>
-              <div style={{ color: "#94a3b8", fontSize: 13 }}>
-                Tell visitors about yourself
-              </div>
-            </div>
-
-            <textarea
-              name="bio"
-              value={profileData.bio}
-              onChange={handleInputChange}
-              style={
-                isEditing
-                  ? styles.textarea
-                  : {
-                      ...styles.textarea,
-                      background: "#fbfbff",
-                      border: "1px dashed transparent",
-                      color: "#64748b",
-                    }
-              }
-              readOnly={!isEditing}
-            />
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: 12,
-              }}
-            >
-              <div style={styles.hint}>
-                Tip: write a short summary of your skills and goals.
-              </div>
-              <div style={{ color: "#94a3b8", fontSize: 13 }}>
-                Last updated: {profileData.joinedDate || "—"}
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

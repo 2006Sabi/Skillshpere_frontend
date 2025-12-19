@@ -19,7 +19,8 @@ const SignUpPage: React.FC = () => {
     phone: '',
     city: '',
     country: '',
-    bio: ''
+    bio: '',
+    role: 'user' // Default to user
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
@@ -83,6 +84,10 @@ const SignUpPage: React.FC = () => {
     }
   };
 
+  const handleRoleChange = (role: string) => {
+    setFormData(prev => ({ ...prev, role }));
+  };
+
   const handleContinue = () => {
     if (validateStep1()) {
       setCurrentStep(2);
@@ -110,6 +115,7 @@ const SignUpPage: React.FC = () => {
           city: formData.city,
           country: formData.country,
           phone: formData.phone,
+          role: formData.role
         }),
       });
 
@@ -122,11 +128,50 @@ const SignUpPage: React.FC = () => {
       // Save authentication token to localStorage
       localStorage.setItem('authToken', data.token);
 
+      if (data.user) {
+        const userProfile = {
+          id: data.user.id || data.user._id,
+          username: data.user.username,
+          email: data.user.email,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          // fullName might need constructing if not returned
+          fullName: `${data.user.firstName} ${data.user.lastName || ""}`.trim(),
+          skills: [],
+          completedCourses: [],
+          role: data.user.role || 'user',
+          bio: "",
+          avatar: null,
+          joinedDate: new Date().toISOString(),
+          currentProjects: [],
+          achievements: [],
+          skillLevel: "Beginner"
+        };
+        saveUserProfile(userProfile);
+        // Notify other components
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key: "userProfile",
+            newValue: JSON.stringify(userProfile),
+          })
+        );
+      }
+
       setIsLoading(false);
-      navigate('/dashboard');
+      navigate(formData.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
       console.error('Registration error:', err);
-      setErrors({ email: err.message });
+      // setErrors({ email: err.message }); // Keep this if you want field level error
+
+      const errorMessage = err.message || "Registration failed";
+
+      if (errorMessage.includes("User already exists")) {
+        alert("Account already exists! redircting to login...");
+        navigate('/login');
+      } else {
+        setErrors({ email: errorMessage });
+      }
+
       setIsLoading(false);
     }
   };
@@ -146,8 +191,8 @@ const SignUpPage: React.FC = () => {
 
       <div className="relative w-full max-w-2xl">
         {/* Back to home button */}
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors mb-8 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -155,9 +200,8 @@ const SignUpPage: React.FC = () => {
         </Link>
 
         {/* Sign up form */}
-        <div className={`bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
-        }`}>
+        <div className={`bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
+          }`}>
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -172,11 +216,10 @@ const SignUpPage: React.FC = () => {
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
-                    currentStep >= step.number 
-                      ? 'bg-indigo-600 text-white' 
-                      : 'bg-gray-200 text-gray-500'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${currentStep >= step.number
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-200 text-gray-500'
+                    }`}>
                     {currentStep > step.number ? (
                       <Check className="w-5 h-5" />
                     ) : (
@@ -184,18 +227,16 @@ const SignUpPage: React.FC = () => {
                     )}
                   </div>
                   <div className="mt-2 text-center">
-                    <div className={`text-sm font-medium ${
-                      currentStep >= step.number ? 'text-indigo-600' : 'text-gray-500'
-                    }`}>
+                    <div className={`text-sm font-medium ${currentStep >= step.number ? 'text-indigo-600' : 'text-gray-500'
+                      }`}>
                       {step.title}
                     </div>
                     <div className="text-xs text-gray-400">{step.description}</div>
                   </div>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-4 mt-5 transition-all duration-300 ${
-                    currentStep > step.number ? 'bg-indigo-600' : 'bg-gray-200'
-                  }`} />
+                  <div className={`w-16 h-0.5 mx-4 mt-5 transition-all duration-300 ${currentStep > step.number ? 'bg-indigo-600' : 'bg-gray-200'
+                    }`} />
                 )}
               </div>
             ))}
@@ -206,7 +247,31 @@ const SignUpPage: React.FC = () => {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">Account Details</h3>
-                
+
+                {/* Role Selection */}
+                <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+                  <button
+                    type="button"
+                    onClick={() => handleRoleChange('user')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${formData.role === 'user'
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                  >
+                    User
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRoleChange('admin')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${formData.role === 'admin'
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                  >
+                    Admin
+                  </button>
+                </div>
+
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -222,11 +287,10 @@ const SignUpPage: React.FC = () => {
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                          errors.firstName 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
-                        }`}
+                        className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.firstName
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                          }`}
                         placeholder="Enter your first name"
                         disabled={isLoading}
                       />
@@ -252,11 +316,10 @@ const SignUpPage: React.FC = () => {
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                          errors.lastName 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
-                        }`}
+                        className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.lastName
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                          }`}
                         placeholder="Enter your last name"
                         disabled={isLoading}
                       />
@@ -284,11 +347,10 @@ const SignUpPage: React.FC = () => {
                       name="username"
                       value={formData.username}
                       onChange={handleInputChange}
-                      className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                        errors.username 
-                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
-                      }`}
+                      className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.username
+                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                        }`}
                       placeholder="Choose a username"
                       disabled={isLoading}
                     />
@@ -315,11 +377,10 @@ const SignUpPage: React.FC = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                        errors.email 
-                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
-                      }`}
+                      className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.email
+                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                        }`}
                       placeholder="Enter your email address"
                       disabled={isLoading}
                     />
@@ -347,11 +408,10 @@ const SignUpPage: React.FC = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                          errors.password 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
-                        }`}
+                        className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.password
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                          }`}
                         placeholder="Create a password"
                         disabled={isLoading}
                       />
@@ -389,11 +449,10 @@ const SignUpPage: React.FC = () => {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                          errors.confirmPassword 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
-                        }`}
+                        className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.confirmPassword
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400'
+                          }`}
                         placeholder="Confirm your password"
                         disabled={isLoading}
                       />
@@ -434,7 +493,7 @@ const SignUpPage: React.FC = () => {
             {currentStep === 2 && (
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">Personal Information</h3>
-                
+
                 {/* Phone Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-700 block">
@@ -557,8 +616,8 @@ const SignUpPage: React.FC = () => {
           <div className="text-center mt-8">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
               >
                 Sign in

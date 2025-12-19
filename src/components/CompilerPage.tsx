@@ -48,9 +48,9 @@ const CompilerPage: React.FC = () => {
   const [fontSize, setFontSize] = useState(14);
   const [theme, setTheme] = useState('dark');
   const [showSettings, setShowSettings] = useState(false);
-  const [savedFiles, setSavedFiles] = useState<Array<{id: string, name: string, code: string, language: string}>>([]);
+  const [savedFiles, setSavedFiles] = useState<Array<{ id: string, name: string, code: string, language: string }>>([]);
   const [executionHistory, setExecutionHistory] = useState<ExecutionResult[]>([]);
-  
+
   const codeEditorRef = useRef<HTMLTextAreaElement>(null);
 
   const codeTemplates: CodeTemplate[] = [
@@ -120,7 +120,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors());
@@ -707,7 +707,7 @@ app.listen(PORT, () => {
           };
         } else if (activeTab === 'express') {
           result = {
-            output: `🚀 Express server started successfully!\n\n📡 Server running on port 5000\n⏱️  Startup time: ${executionTime}ms\n\n✅ Routes registered:\n  GET /\n  GET /api/users\n  GET /api/users/:id\n  POST /api/users\n\n🔒 Middleware loaded:\n  - CORS enabled\n  - JSON parser active\n  - Morgan logger active`,
+            output: `🚀 Express server started successfully!\n\n📡 Server running on port 5001\n⏱️  Startup time: ${executionTime}ms\n\n✅ Routes registered:\n  GET /\n  GET /api/users\n  GET /api/users/:id\n  POST /api/users\n\n🔒 Middleware loaded:\n  - CORS enabled\n  - JSON parser active\n  - Morgan logger active`,
             executionTime,
             status: 'success'
           };
@@ -789,18 +789,17 @@ app.listen(PORT, () => {
               <Zap className="w-6 h-6 text-yellow-500" />
               <h1 className="text-xl font-bold">MERN Stack Compiler</h1>
             </div>
-            
+
             {/* Technology Tabs */}
             <div className="flex bg-gray-700 rounded-lg p-1">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                    activeTab === tab.id
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${activeTab === tab.id
                       ? 'bg-gray-600 text-white'
                       : 'text-gray-300 hover:text-white hover:bg-gray-600'
-                  }`}
+                    }`}
                 >
                   <span className={tab.color}>{tab.icon}</span>
                   <span>{tab.name}</span>

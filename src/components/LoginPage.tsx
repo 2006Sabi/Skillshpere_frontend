@@ -24,6 +24,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     password: "",
   });
 
+  // Role Toggle State
+  const [role, setRole] = useState<'user' | 'admin'>('user');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,14 +41,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
-    } else if (formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
     }
 
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -71,6 +70,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         body: JSON.stringify({
           usernameOrEmail: formData.username,
           password: formData.password,
+          role: role,
         }),
       });
 
@@ -88,12 +88,51 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       const data = await res.json();
 
+      // Check if role matches (Redundant with backend check but good for safety)
+      // Backend now returns 403 if role mismatch, which is caught below as error message
+
       // Save authentication token to localStorage
       localStorage.setItem("authToken", data.token);
 
+      // Construct and save user profile
+      if (data.user) {
+        const userProfile = {
+          id: data.user.id || data.user._id,
+          username: data.user.username,
+          email: data.user.email,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          fullName: `${data.user.firstName} ${data.user.lastName || ""}`.trim(),
+          bio: data.user.bio,
+          avatar: data.user.avatarUrl || null,
+          joinedDate: data.user.createdAt,
+          skills: data.user.skills || [],
+          completedCourses: data.user.completedCourses || [],
+          currentProjects: [],
+          achievements: [],
+          skillLevel: data.user.skillLevel || "Beginner",
+          role: data.user.role || 'user'
+        };
+        saveUserProfile(userProfile);
+
+        // Notify other components
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key: "userProfile",
+            newValue: JSON.stringify(userProfile),
+          })
+        );
+      }
+
       setIsLoading(false);
       onLogin();
-      navigate("/dashboard");
+
+      if (role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+
     } catch (err: any) {
       console.error("Login error:", err);
       setErrors({ username: err.message, password: "" });
@@ -140,11 +179,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         {/* Login form */}
         <div
-          className={`bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 transition-all duration-700 ${
-            isVisible
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 translate-y-8 scale-95"
-          }`}
+          className={`bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 transition-all duration-700 ${isVisible
+            ? "opacity-100 translate-y-0 scale-100"
+            : "opacity-0 translate-y-8 scale-95"
+            }`}
         >
           {/* Header */}
           <div className="text-center mb-8">
@@ -157,6 +195,30 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             <p className="text-gray-600">
               Sign in to continue your learning journey
             </p>
+          </div>
+
+          {/* Role Toggle */}
+          <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+            <button
+              type="button"
+              onClick={() => setRole('user')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${role === 'user'
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+                }`}
+            >
+              User Login
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('admin')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${role === 'admin'
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+                }`}
+            >
+              Admin Login
+            </button>
           </div>
 
           {/* Form */}
@@ -175,11 +237,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   name="username"
                   value={formData.username}
                   onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                    errors.username
-                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
-                  }`}
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.username
+                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
+                    }`}
                   placeholder="Enter your username"
                   disabled={isLoading}
                 />
@@ -206,11 +267,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                    errors.password
-                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
-                  }`}
+                  className={`block w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${errors.password
+                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
+                    }`}
                   placeholder="Enter your password"
                   disabled={isLoading}
                 />

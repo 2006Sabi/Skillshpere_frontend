@@ -6,13 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      // forward /api/* to backend
       "/api": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/uploads": {
-        target: "http://localhost:5000",
+        target: "http://127.0.0.1:5001", // backend url
         changeOrigin: true,
         secure: false,
       },

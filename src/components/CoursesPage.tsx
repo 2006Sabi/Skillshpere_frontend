@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import {
   Search,
   Filter,
@@ -25,21 +26,21 @@ interface Course {
   _id: string;
   title: string;
   description: string;
-  shortDescription: string;
-  thumbnail: string;
+  shortDescription?: string;
+  thumbnail?: string;
   provider: {
     name: string;
     logo: string;
     website: string;
   };
-  externalUrl: string;
-  category: string;
+  externalUrl?: string;
+  category?: string;
   subcategory?: string;
-  level: "beginner" | "intermediate" | "advanced";
+  level: "beginner" | "intermediate" | "advanced" | string;
   duration: {
     hours: number;
     weeks?: number;
-  };
+  } | string;
   price: {
     original?: number;
     discounted?: number;
@@ -57,8 +58,8 @@ interface Course {
     icon: string;
     color: string;
   }>;
-  features: string[];
-  language: string;
+  features?: string[];
+  language?: string;
   tags: string[];
   isRecommended?: boolean;
   isTrending?: boolean;
@@ -82,419 +83,62 @@ const CoursesPage: React.FC = () => {
     new Set()
   );
 
-  // Sample data (in production, this would come from the backend API)
-  const sampleCourses: Course[] = [
-    {
-      _id: "1",
-      title: "Complete MERN Stack Development",
-      description:
-        "Master MongoDB, Express.js, React, and Node.js to build full-stack web applications. This comprehensive course covers everything from basics to advanced concepts with hands-on projects.",
-      shortDescription:
-        "Learn to build complete web applications using the MERN stack",
-      thumbnail:
-        "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500",
-      provider: {
-        name: "Guvi",
-        logo: "https://www.guvi.in/build/images/logo.svg",
-        website: "https://www.guvi.in",
-      },
-      externalUrl: "https://www.guvi.in/courses/mern-stack-development",
-      category: "Full Stack",
-      subcategory: "React",
-      level: "intermediate",
-      duration: { hours: 40, weeks: 8 },
-      price: {
-        original: 2999,
-        discounted: 1999,
-        currency: "INR",
-        isFree: false,
-      },
-      rating: { average: 4.8, count: 1250, source: "Guvi Platform" },
-      enrollmentCount: 15420,
-      technologies: [
-        { name: "MongoDB", icon: "🍃", color: "#47A248" },
-        { name: "Express.js", icon: "⚡", color: "#000000" },
-        { name: "React", icon: "⚛️", color: "#61DAFB" },
-        { name: "Node.js", icon: "🟢", color: "#339933" },
-      ],
-      features: [
-        "Video Lectures",
-        "Hands-on Projects",
-        "Certificate",
-        "Lifetime Access",
-        "Community Support",
-      ],
-      language: "English",
-      tags: ["MERN", "Full Stack", "JavaScript", "React", "Node.js"],
-      isRecommended: true,
-      isTrending: true,
-    },
-    {
-      _id: "2",
-      title: "JavaScript Fundamentals for Beginners",
-      description:
-        "Start your programming journey with JavaScript. Learn variables, functions, objects, and DOM manipulation through interactive exercises and real-world examples.",
-      shortDescription: "Master JavaScript basics with hands-on practice",
-      thumbnail:
-        "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=500",
-      provider: {
-        name: "FreeCodeCamp",
-        logo: "https://cdn.freecodecamp.org/platform/universal/fcc_primary.svg",
-        website: "https://www.freecodecamp.org",
-      },
-      externalUrl:
-        "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/",
-      category: "Frontend",
-      subcategory: "JavaScript",
-      level: "beginner",
-      duration: { hours: 25, weeks: 5 },
-      price: { isFree: true },
-      rating: { average: 4.9, count: 50000, source: "FreeCodeCamp" },
-      enrollmentCount: 250000,
-      technologies: [
-        { name: "JavaScript", icon: "📜", color: "#F7DF1E" },
-        { name: "HTML", icon: "🌐", color: "#E34F26" },
-        { name: "CSS", icon: "🎨", color: "#1572B6" },
-      ],
-      features: ["Interactive Coding", "Free Certificate", "Community Support"],
-      language: "English",
-      tags: ["JavaScript", "Programming", "Beginner", "Free"],
-      isRecommended: true,
-    },
-    {
-      _id: "3",
-      title: "Advanced React Patterns and Performance",
-      description:
-        "Take your React skills to the next level with advanced patterns, performance optimization techniques, and modern React features like Suspense and Concurrent Mode.",
-      shortDescription:
-        "Master advanced React concepts and optimization techniques",
-      thumbnail:
-        "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=500",
-      provider: {
-        name: "Coursera",
-        logo: "https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://coursera-course-photos.s3.amazonaws.com/fb/a049d0d48f11e5ab95bb54825b6b60/coursera-logo.png?auto=format%2Ccompress&dpr=1",
-        website: "https://www.coursera.org",
-      },
-      externalUrl: "https://www.coursera.org/learn/advanced-react",
-      category: "Frontend",
-      subcategory: "React",
-      level: "advanced",
-      duration: { hours: 35, weeks: 7 },
-      price: { original: 49, currency: "USD", isFree: false },
-      rating: { average: 4.7, count: 3200, source: "Coursera" },
-      enrollmentCount: 12500,
-      technologies: [
-        { name: "React", icon: "⚛️", color: "#61DAFB" },
-        { name: "TypeScript", icon: "🔷", color: "#3178C6" },
-        { name: "Testing", icon: "🧪", color: "#E33332" },
-      ],
-      features: [
-        "Video Lectures",
-        "Peer Reviews",
-        "Certificate",
-        "Mobile Access",
-      ],
-      language: "English",
-      tags: ["React", "Advanced", "Performance", "Testing"],
-      isNew: true,
-    },
-    {
-      _id: "4",
-      title: "Node.js Backend Development Masterclass",
-      description:
-        "Build robust backend applications with Node.js and Express. Learn authentication, database integration, API design, testing, and deployment strategies.",
-      shortDescription: "Master backend development with Node.js and Express",
-      thumbnail:
-        "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=500",
-      provider: {
-        name: "Udemy",
-        logo: "https://www.udemy.com/staticx/udemy/images/v7/logo-udemy.svg",
-        website: "https://www.udemy.com",
-      },
-      externalUrl:
-        "https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/",
-      category: "Backend",
-      subcategory: "Node.js",
-      level: "intermediate",
-      duration: { hours: 42, weeks: 8 },
-      price: {
-        original: 84.99,
-        discounted: 12.99,
-        currency: "USD",
-        isFree: false,
-      },
-      rating: { average: 4.8, count: 8500, source: "Udemy" },
-      enrollmentCount: 45000,
-      technologies: [
-        { name: "Node.js", icon: "🟢", color: "#339933" },
-        { name: "Express.js", icon: "⚡", color: "#000000" },
-        { name: "MongoDB", icon: "🍃", color: "#47A248" },
-      ],
-      features: [
-        "Video Lectures",
-        "Coding Exercises",
-        "Certificate",
-        "Lifetime Access",
-      ],
-      language: "English",
-      tags: ["Node.js", "Backend", "API", "Database"],
-      isTrending: true,
-    },
-      {
-        _id: "GML-FE-HTML-001",
-        title: "Front End Development – HTML",
-        description:
-          "A beginner-friendly course that teaches HTML and basic CSS to build static and responsive web pages. Includes exercises and a completion certificate.",
-        shortDescription:
-          "HTML & basic CSS for front-end development (free, certificate).",
-        thumbnail:
-          "https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=500",
-        provider: {
-          name: "MyGreatLearning",
-          logo: "https://www.mygreatlearning.com/static/images/logo.png",
-          website: "https://www.mygreatlearning.com",
-        },
-        externalUrl:
-          "https://www.mygreatlearning.com/academy/learn-for-free/courses/front-end-development-html",
-        category: "Frontend",
-        subcategory: "HTML & CSS",
-        level: "beginner",
-        duration: { hours: 8, weeks: 1 },
-        price: { original: 0, discounted: 0, currency: "USD", isFree: true },
-        rating: {
-          average: 4.6,
-          count: 4200,
-          source: "MyGreatLearning Reviews",
-        },
-        enrollmentCount: 45000,
-        technologies: [
-          { name: "HTML5", icon: "📄", color: "#E44D26" },
-          { name: "CSS3", icon: "🎨", color: "#1572B6" },
-        ],
-        features: ["Video Lectures", "Quizzes", "Certificate of Completion"],
-        language: "English",
-        tags: ["HTML", "CSS", "Frontend", "Beginner"],
-        isRecommended: true,
-        isTrending: false,
-      },
-      {
-        _id: "SML-FE-SKILLUP-002",
-        title: "Free Front-End Developer Course (SkillUp)",
-        description:
-          "A free SkillUp course from Simplilearn covering HTML, CSS, JavaScript fundamentals and Git basics. Includes a free completion certificate.",
-        shortDescription:
-          "HTML, CSS, JS & Git — free front-end fundamentals with certificate.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500",
-        provider: {
-          name: "Simplilearn (SkillUp)",
-          logo: "https://www.simplilearn.com/ice9/new_logo.svg",
-          website: "https://www.simplilearn.com",
-        },
-        externalUrl:
-          "https://www.simplilearn.com/front-end-developer-free-course-skillup",
-        category: "Frontend",
-        subcategory: "Web Development",
-        level: "beginner",
-        duration: { hours: 20, weeks: 3 },
-        price: { original: 0, discounted: 0, currency: "USD", isFree: true },
-        rating: { average: 4.5, count: 3800, source: "Simplilearn Reviews" },
-        enrollmentCount: 68000,
-        technologies: [
-          { name: "HTML", icon: "📄", color: "#E44D26" },
-          { name: "CSS", icon: "🎨", color: "#1572B6" },
-          { name: "JavaScript", icon: "✨", color: "#F7DF1E" },
-          { name: "Git", icon: "🔧", color: "#F05032" },
-        ],
-        features: ["Self-paced", "Certificate", "Hands-on Labs"],
-        language: "English",
-        tags: ["Frontend", "JavaScript", "Git", "Free"],
-        isRecommended: true,
-        isTrending: true,
-      },
-      {
-        _id: "GML-FS-INTRO-003",
-        title: "Become Full Stack Developer",
-        description:
-          "An introductory full-stack program covering front-end basics, backend fundamentals, and databases — aimed at beginners wanting an end-to-end overview.",
-        shortDescription:
-          "Introductory full-stack course (frontend + backend basics) — free.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500",
-        provider: {
-          name: "MyGreatLearning",
-          logo: "https://www.mygreatlearning.com/static/images/logo.png",
-          website: "https://www.mygreatlearning.com",
-        },
-        externalUrl:
-          "https://www.mygreatlearning.com/academy/learn-for-free/courses/become-full-stack-developer",
-        category: "Full Stack",
-        subcategory: "Introductory",
-        level: "beginner",
-        duration: { hours: 40, weeks: 6 },
-        price: { original: 0, discounted: 0, currency: "USD", isFree: true },
-        rating: { average: 4.4, count: 5400, source: "MyGreatLearning" },
-        enrollmentCount: 72000,
-        technologies: [
-          { name: "HTML", icon: "📄", color: "#E44D26" },
-          { name: "JavaScript", icon: "✨", color: "#F7DF1E" },
-          { name: "Node.js", icon: "🟢", color: "#339933" },
-        ],
-        features: ["Modules", "Project Exercises", "Certificate"],
-        language: "English",
-        tags: ["Full Stack", "Beginner", "MERN Intro"],
-        isRecommended: true,
-        isTrending: false,
-      },
-      {
-        _id: "GML-DEVOPS-INTRO-004",
-        title: "Introduction to DevOps",
-        description:
-          "Fundamentals of DevOps: culture, CI/CD basics, containers, and monitoring. A short free course with a certificate on completion.",
-        shortDescription: "DevOps fundamentals with certificate (free).",
-        thumbnail:
-          "https://images.unsplash.com/photo-1526378721577-86bdf9f0d7c6?w=500",
-        provider: {
-          name: "MyGreatLearning",
-          logo: "https://www.mygreatlearning.com/static/images/logo.png",
-          website: "https://www.mygreatlearning.com",
-        },
-        externalUrl:
-          "https://www.mygreatlearning.com/academy/learn-for-free/courses/introduction-to-devops1",
-        category: "DevOps",
-        subcategory: "Foundations",
-        level: "beginner",
-        duration: { hours: 12, weeks: 2 },
-        price: { original: 0, discounted: 0, currency: "USD", isFree: true },
-        rating: { average: 4.5, count: 2100, source: "MyGreatLearning" },
-        enrollmentCount: 38000,
-        technologies: [
-          { name: "CI/CD", icon: "🔁", color: "#6C7A89" },
-          { name: "Containers", icon: "📦", color: "#2496ED" },
-        ],
-        features: ["Video Lessons", "Certificate", "Intro Projects"],
-        language: "English",
-        tags: ["DevOps", "CI/CD", "Containers", "Free"],
-        isRecommended: true,
-        isTrending: false,
-      },
-      {
-        _id: "KH-DEVOPS-FREE-005",
-        title: "Free DevOps Certification Course",
-        description:
-          "A self-paced introductory DevOps course from KnowledgeHut that covers CI/CD concepts, tools overview, and a certificate on completion.",
-        shortDescription:
-          "KnowledgeHut free DevOps course with certificate (self-paced).",
-        thumbnail:
-          "https://images.unsplash.com/photo-1537432376769-00a8f44aa2f9?w=500",
-        provider: {
-          name: "KnowledgeHut",
-          logo: "https://www.knowledgehut.com/assets/images/logo/kh-logo.png",
-          website: "https://www.knowledgehut.com",
-        },
-        externalUrl:
-          "https://www.knowledgehut.com/free-courses/free-introduction-to-devops-course-with-certificate",
-        category: "DevOps",
-        subcategory: "Foundations",
-        level: "beginner",
-        duration: { hours: 10, weeks: 2 },
-        price: { original: 0, discounted: 0, currency: "USD", isFree: true },
-        rating: { average: 4.3, count: 900, source: "KnowledgeHut" },
-        enrollmentCount: 15000,
-        technologies: [
-          { name: "CI/CD", icon: "🔁", color: "#6C7A89" },
-          { name: "Docker", icon: "🐳", color: "#2496ED" },
-        ],
-        features: ["Self-paced", "Certificate", "Tool Demos"],
-        language: "English",
-        tags: ["DevOps", "Free", "Certificate"],
-        isRecommended: false,
-        isTrending: false,
-      },
-      {
-        _id: "META-BE-COURSE-006",
-        title: "Meta Back-End Developer Professional Certificate",
-        description:
-          "A professional certificate program focused on backend development, APIs, databases, and production-ready services. Project-based and recognized by employers.",
-        shortDescription:
-          "Meta professional certificate — backend developer track (paid, Coursera).",
-        thumbnail:
-          "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500",
-        provider: {
-          name: "Coursera",
-          logo: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Coursera_logo.svg",
-          website: "https://www.coursera.org",
-        },
-        externalUrl:
-          "https://www.coursera.org/professional-certificates/meta-back-end-developer",
-        category: "Backend",
-        subcategory: "Professional Certificate",
-        level: "beginner",
-        duration: { hours: 200, weeks: 20 },
-        price: { original: 49, discounted: 49, currency: "USD", isFree: false },
-        rating: { average: 4.7, count: 18000, source: "Coursera Reviews" },
-        enrollmentCount: 120000,
-        technologies: [
-          { name: "APIs", icon: "🔗", color: "#6C7A89" },
-          { name: "Databases", icon: "🗄️", color: "#006DB6" },
-          { name: "Python/JS", icon: "💻", color: "#F7DF1E" },
-        ],
-        features: [
-          "Hands-on Projects",
-          "Professional Certificate",
-          "Career Resources",
-        ],
-        language: "English",
-        tags: ["Backend", "APIs", "Database", "Professional Certificate"],
-        isRecommended: true,
-        isTrending: true,
-      },
-      {
-        _id: "COURSE-DEV-WEB-007",
-        title: "Web Development Courses (Coursera Collection)",
-        description:
-          "A curated collection of web development courses on Coursera covering frontend, backend, full-stack topics — many can be audited for free; certificates available with payment.",
-        shortDescription:
-          "Coursera catalog: web development (audit free, certificates paid).",
-        thumbnail:
-          "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500",
-        provider: {
-          name: "Coursera",
-          logo: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Coursera_logo.svg",
-          website: "https://www.coursera.org",
-        },
-        externalUrl: "https://www.coursera.org/search?query=web%20development",
-        category: "Full Stack",
-        subcategory: "Catalog",
-        level: "beginner",
-        duration: { hours: 0, weeks: 0 },
-        price: { original: 0, discounted: 0, currency: "USD", isFree: true },
-        rating: { average: 4.6, count: 50000, source: "Coursera Catalog" },
-        enrollmentCount: 500000,
-        technologies: [
-          { name: "HTML/CSS", icon: "📄", color: "#E44D26" },
-          { name: "JavaScript", icon: "✨", color: "#F7DF1E" },
-          { name: "Backend", icon: "🗄️", color: "#006DB6" },
-        ],
-        features: [
-          "Audit for Free",
-          "Certificates Available",
-          "Specializations",
-        ],
-        language: "English",
-        tags: ["Web Development", "Catalog", "Coursera", "Audit"],
-        isRecommended: false,
-        isTrending: false,
-      },
-  ];
-
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setCourses(sampleCourses);
-      setFilteredCourses(sampleCourses);
-      setLoading(false);
-    }, 1000);
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/courses");
+        const backendCourses = response.data;
+
+        // Map backend data to frontend structure
+        const mappedCourses = backendCourses.map((course: any) => ({
+          _id: course._id,
+          title: course.title,
+          description: course.description || "No description",
+          shortDescription: course.description ? course.description.substring(0, 100) + "..." : "No description",
+          thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500", // Default
+          provider: {
+            name: "SkillSphere",
+            logo: "https://via.placeholder.com/150",
+            website: ""
+          },
+          externalUrl: course.externalUrl,
+          level: (course.difficulty?.toLowerCase() || "beginner"),
+          duration: course.duration ? { hours: parseInt(course.duration) || 10 } : { hours: 10 },
+          price: { isFree: true, currency: "USD", original: 0, discounted: 0 },
+          rating: { average: 5.0, count: 1, source: "SkillSphere" },
+          enrollmentCount: 0,
+          tags: course.tags || [],
+          features: [],
+          technologies: (course.techStack || []).map((tech: string) => {
+            const name = tech.toLowerCase();
+            let icon = "💻";
+            let color = "#6B7280"; // gray-500
+
+            if (name.includes("react")) { icon = "⚛️"; color = "#61DAFB"; }
+            else if (name.includes("node")) { icon = "🟢"; color = "#339933"; }
+            else if (name.includes("python")) { icon = "🐍"; color = "#3776AB"; }
+            else if (name.includes("java")) { icon = "☕"; color = "#007396"; }
+            else if (name.includes("mongo")) { icon = "🍃"; color = "#47A248"; }
+            else if (name.includes("vue")) { icon = "💚"; color = "#4FC08D"; }
+            else if (name.includes("angular")) { icon = "🅰️"; color = "#DD0031"; }
+            else if (name.includes("aws")) { icon = "☁️"; color = "#FF9900"; }
+
+            return { name: tech, icon, color };
+          }),
+          category: "Full Stack", // Default category
+          isNew: true
+        }));
+
+        setCourses(mappedCourses);
+        setFilteredCourses(mappedCourses);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
 
     // Load wishlist and enrolled courses from localStorage
     const savedWishlist = JSON.parse(
@@ -539,30 +183,27 @@ const CoursesPage: React.FC = () => {
     // Provider filter
     if (selectedProvider !== "all") {
       filtered = filtered.filter(
-        (course) => course.provider.name === selectedProvider
+        (course) => course.provider?.name === selectedProvider
       );
     }
 
     // Price filter
     if (priceFilter === "free") {
-      filtered = filtered.filter((course) => course.price.isFree);
+      filtered = filtered.filter((course) => course.price?.isFree);
     } else if (priceFilter === "paid") {
-      filtered = filtered.filter((course) => !course.price.isFree);
+      filtered = filtered.filter((course) => !course.price?.isFree);
     }
 
     // Sort
     switch (sortBy) {
       case "popular":
-        filtered.sort((a, b) => b.enrollmentCount - a.enrollmentCount);
+        filtered.sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
         break;
       case "rating":
-        filtered.sort((a, b) => b.rating.average - a.rating.average);
+        filtered.sort((a, b) => (b.rating?.average || 0) - (a.rating?.average || 0));
         break;
       case "newest":
         filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-        break;
-      case "duration":
-        filtered.sort((a, b) => a.duration.hours - b.duration.hours);
         break;
     }
 
@@ -600,8 +241,10 @@ const CoursesPage: React.FC = () => {
       JSON.stringify(Array.from(newEnrollments))
     );
 
-    // Open external course URL
-    window.open(course.externalUrl, "_blank");
+    // Open external course URL if available
+    if (course.externalUrl) {
+      window.open(course.externalUrl, "_blank");
+    }
   };
 
   const getLevelColor = (level: string) => {
@@ -741,21 +384,19 @@ const CoursesPage: React.FC = () => {
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded ${
-                    viewMode === "grid"
-                      ? "bg-white shadow"
-                      : "hover:bg-gray-200"
-                  }`}
+                  className={`p-2 rounded ${viewMode === "grid"
+                    ? "bg-white shadow"
+                    : "hover:bg-gray-200"
+                    }`}
                 >
                   <Grid3X3 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded ${
-                    viewMode === "list"
-                      ? "bg-white shadow"
-                      : "hover:bg-gray-200"
-                  }`}
+                  className={`p-2 rounded ${viewMode === "list"
+                    ? "bg-white shadow"
+                    : "hover:bg-gray-200"
+                    }`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -799,211 +440,213 @@ const CoursesPage: React.FC = () => {
                 <option value="Udemy">Udemy</option>
                 <option value="FreeCodeCamp">FreeCodeCamp</option>
               </select>
+
+              <select
+                value={priceFilter}
+                onChange={(e) => setPriceFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="all">All Prices</option>
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+              </select>
             </div>
           )}
         </div>
       </div>
 
-      {/* Results */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {filteredCourses.length} courses found
-          </h2>
-
-          {searchQuery && (
-            <div className="text-sm text-gray-600">
-              Showing results for "
-              <span className="font-medium">{searchQuery}</span>"
-            </div>
-          )}
-        </div>
-
-        {/* Course Grid */}
+      {/* Course Grid/List */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div
-          className={`grid gap-6 ${
-            viewMode === "grid"
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-              : "grid-cols-1"
-          }`}
+          className={`${viewMode === "grid"
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            : "space-y-6"
+            }`}
         >
           {filteredCourses.map((course) => (
             <div
               key={course._id}
-              className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
-                viewMode === "list" ? "flex" : ""
-              }`}
-            >
-              {/* Course Image */}
-              <div
-                className={`relative ${
-                  viewMode === "list" ? "w-64 flex-shrink-0" : "aspect-video"
+              className={`bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group ${viewMode === "list" ? "flex" : ""
                 }`}
+            >
+              <div
+                className={`relative ${viewMode === "list" ? "w-72 flex-shrink-0" : ""
+                  }`}
               >
                 <img
                   src={course.thumbnail}
                   alt={course.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-
-                {/* Badges */}
-                <div className="absolute top-3 left-3 flex flex-wrap gap-1">
-                  {course.isRecommended && (
-                    <span className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
-                      <Star className="w-3 h-3 mr-1" />
-                      Recommended
-                    </span>
-                  )}
-                  {course.isTrending && (
-                    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      Trending
-                    </span>
-                  )}
-                  {course.isNew && (
-                    <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                      New
-                    </span>
-                  )}
-                </div>
-
-                {/* Wishlist */}
                 <button
-                  onClick={() => toggleWishlist(course._id)}
-                  className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleWishlist(course._id);
+                  }}
+                  className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
                 >
                   <Heart
-                    className={`w-4 h-4 ${
-                      wishlist.has(course._id)
-                        ? "fill-red-500 text-red-500"
-                        : "text-gray-600"
-                    }`}
+                    className={`w-5 h-5 ${wishlist.has(course._id)
+                      ? "fill-red-500 text-red-500"
+                      : "text-gray-600"
+                      }`}
                   />
                 </button>
-
-                {/* Duration */}
-                <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
-                  <Clock className="w-3 h-3 mr-1" />
-                  {course.duration.hours}h
-                </div>
-              </div>
-
-              {/* Course Content */}
-              <div className="p-6 flex-1">
-                {/* Provider */}
-                <div className="flex items-center justify-between mb-3">
+                <div className="absolute bottom-4 left-4 flex gap-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getProviderColor(
-                      course.provider.name
-                    )}`}
-                  >
-                    {course.provider.name}
-                  </span>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(
+                    className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md bg-white/90 ${getLevelColor(
                       course.level
                     )}`}
                   >
-                    {course.level}
+                    {course.level.charAt(0).toUpperCase() +
+                      course.level.slice(1)}
                   </span>
+                  {course.isNew && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500 text-white shadow-lg">
+                      New
+                    </span>
+                  )}
+                  {course.isTrending && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white shadow-lg flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" />
+                      Trending
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-6 flex flex-col flex-1">
+                <div className="flex items-center gap-2 mb-3">
+                  {course.provider && (
+                    <>
+                      <img
+                        src={course.provider.logo}
+                        alt={course.provider.name}
+                        className="w-5 h-5 rounded-full object-contain"
+                      />
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded ${getProviderColor(
+                          course.provider.name
+                        )}`}
+                      >
+                        {course.provider.name}
+                      </span>
+                    </>
+                  )}
+
                 </div>
 
-                {/* Title */}
-                <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
                   {course.title}
                 </h3>
-
-                {/* Description */}
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {course.shortDescription}
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
+                  {course.description}
                 </p>
 
-                {/* Technologies */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {course.technologies.slice(0, 3).map((tech, index) => (
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {course.tags.slice(0, 3).map((tag, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                      className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded"
                     >
-                      <span className="mr-1">{tech.icon}</span>
-                      {tech.name}
+                      {tag}
                     </span>
                   ))}
-                  {course.technologies.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs">
-                      +{course.technologies.length - 3} more
+                  {course.tags.length > 3 && (
+                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                      +{course.tags.length - 3} more
                     </span>
                   )}
                 </div>
 
-                {/* Rating and Stats */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium text-gray-900 ml-1">
-                        {course.rating.average}
-                      </span>
-                      <span className="text-sm text-gray-500 ml-1">
-                        ({course.rating.count.toLocaleString()})
-                      </span>
+                {/* Tech Stack Icons */}
+                <div className="flex items-center gap-3 mb-4 pt-4 border-t border-gray-100">
+                  {course.technologies?.slice(0, 4).map((tech, index) => (
+                    <div
+                      key={index}
+                      className="relative group/tech"
+                      title={tech.name}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-lg bg-gray-50 group-hover/tech:scale-110 transition-transform"
+                        style={{ color: tech.color }}
+                      >
+                        {tech.icon}
+                      </div>
                     </div>
+                  ))}
+                </div>
 
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Users className="w-4 h-4 mr-1" />
-                      {course.enrollmentCount.toLocaleString()}
-                    </div>
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {typeof course.duration === 'string' ? course.duration : `${course.duration.hours}h`}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      {(course.enrollmentCount || 0).toLocaleString()}
+                    </span>
+                    <span className="flex items-center gap-1 text-yellow-500">
+                      <Star className="w-4 h-4 fill-current" />
+                      {course.rating?.average}
+                    </span>
                   </div>
                 </div>
 
-                {/* Price and Action */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    {course.price.isFree ? (
-                      <span className="text-2xl font-bold text-green-600">
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                  <div className="flex items-baseline gap-2">
+                    {course.price?.isFree ? (
+                      <span className="text-lg font-bold text-green-600">
                         Free
                       </span>
                     ) : (
-                      <div className="flex items-center space-x-2">
-                        {course.price.discounted && (
-                          <span className="text-2xl font-bold text-indigo-600">
-                            {course.price.currency} {course.price.discounted}
+                      <>
+                        <span className="text-lg font-bold text-gray-900">
+                          {course.price?.currency} {course.price?.discounted}
+                        </span>
+                        {course.price?.original && (
+                          <span className="text-sm text-gray-400 line-through">
+                            {course.price?.currency} {course.price?.original}
                           </span>
                         )}
-                        <span
-                          className={`${
-                            course.price.discounted
-                              ? "text-sm text-gray-500 line-through"
-                              : "text-2xl font-bold text-indigo-600"
-                          }`}
-                        >
-                          {course.price.currency} {course.price.original}
-                        </span>
-                      </div>
+                      </>
                     )}
                   </div>
 
-                  <div className="flex space-x-2">
-                    {enrolledCourses.has(course._id) ? (
-                      <button
-                        onClick={() =>
-                          window.open(course.externalUrl, "_blank")
-                        }
-                        className="flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                  {enrolledCourses.has(course._id) ? (
+                    <a
+                      href={course.externalUrl || "#"}
+                      target={course.externalUrl ? "_blank" : "_self"}
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-xl font-medium hover:bg-green-100 transition-colors cursor-pointer"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Enrolled (Go to Course)
+                    </a>
+                  ) : (
+                    course.externalUrl ? (
+                      <a
+                        href={course.externalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => enrollInCourse(course)} // Keep tracking enrollment locally if desired
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                       >
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Continue
-                      </button>
+                        Enroll Now
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
                     ) : (
                       <button
                         onClick={() => enrollInCourse(course)}
-                        className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                       >
-                        <ExternalLink className="w-4 h-4 mr-2" />
                         Enroll Now
+                        <ExternalLink className="w-4 h-4" />
                       </button>
-                    )}
-                  </div>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -1011,14 +654,17 @@ const CoursesPage: React.FC = () => {
         </div>
 
         {/* Empty State */}
-        {filteredCourses.length === 0 && (
-          <div className="text-center py-16">
-            <BookOpen className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+        {!loading && filteredCourses.length === 0 && (
+          <div className="text-center py-24">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <BookOpen className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
               No courses found
             </h3>
-            <p className="text-gray-600 mb-6">
-              Try adjusting your search terms or filters to find more courses.
+            <p className="text-gray-500">
+              Try adjusting your search or filters to find what you're looking
+              for.
             </p>
             <button
               onClick={() => {
@@ -1028,7 +674,7 @@ const CoursesPage: React.FC = () => {
                 setSelectedProvider("all");
                 setPriceFilter("all");
               }}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
             >
               Clear all filters
             </button>

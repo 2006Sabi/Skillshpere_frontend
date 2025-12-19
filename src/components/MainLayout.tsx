@@ -11,8 +11,6 @@ import {
   LogOut,
   Menu,
   X,
-  Bell,
-  Search,
   Settings,
 } from "lucide-react";
 import {
@@ -171,10 +169,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        aria-hidden={!isSidebarOpen}
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isSidebarOpen ? "translate-x-0 visible" : "-translate-x-full invisible lg:visible"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -282,27 +278,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsSidebarOpen(false)}
-                  className={`group flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                  className={`group flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
+                    ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
                 >
                   <div
-                    className={`flex-shrink-0 transition-colors ${
-                      isActive
-                        ? "text-indigo-600"
-                        : "text-gray-400 group-hover:text-gray-600"
-                    }`}
+                    className={`flex-shrink-0 transition-colors ${isActive
+                      ? "text-indigo-600"
+                      : "text-gray-400 group-hover:text-gray-600"
+                      }`}
                   >
                     {item.icon}
                   </div>
                   <div className="ml-3 flex-1">
                     <div className="text-sm font-medium">{item.label}</div>
                     <div
-                      className={`text-xs mt-0.5 ${
-                        isActive ? "text-indigo-500" : "text-gray-400"
-                      }`}
+                      className={`text-xs mt-0.5 ${isActive ? "text-indigo-500" : "text-gray-400"
+                        }`}
                     >
                       {item.description}
                     </div>
@@ -375,10 +368,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
             </div>
 
             <div className="flex items-center space-x-2">
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
-              </button>
 
               {userProfile ? (
                 <img
@@ -399,42 +388,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
         <header className="hidden lg:flex bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex-1 flex items-center justify-between">
             {/* Search */}
-            <div className="flex-1 max-w-lg">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search courses, projects, or resources..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                />
-              </div>
-            </div>
+            <div className="flex-1" />
 
             {/* Right actions */}
             <div className="flex items-center space-x-4">
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
-              </button>
 
               {userProfile ? (
                 <div className="flex items-center space-x-3">
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">
-                      {userProfile.fullName || userProfile.username}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Learning since{" "}
-                      {userProfile.joinedDate
-                        ? new Date(userProfile.joinedDate).getFullYear()
-                        : "—"}
-                    </div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {userProfile.firstName || userProfile.username}
                   </div>
-                  <img
-                    src={avatarSrc || "/placeholder-avatar.png"}
-                    alt={userProfile.username || "avatar"}
-                    className="w-10 h-10 rounded-xl object-cover ring-2 ring-gray-200"
-                  />
+                  <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                    <User className="w-6 h-6 text-indigo-600" />
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
@@ -455,22 +421,23 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
 
         {/* Content */}
         <main
-          className={`flex-1 overflow-auto transition-all duration-500 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}
+          className={`flex-1 overflow-auto transition-all duration-500 ${isVisible ? "opacity-100" : "opacity-0"
+            }`}
         >
           <div className="p-4 lg:p-6">{children}</div>
         </main>
       </div>
 
       {/* Overlay for mobile when sidebar open */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-    </div>
+      {
+        isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )
+      }
+    </div >
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Code, BookOpen, Rocket, Users, Star, ArrowRight, CheckCircle, Play } from 'lucide-react';
+import { Code, BookOpen, Rocket, Users, Star, ArrowRight, CheckCircle, Play, Clock, Award, Terminal, Heart } from 'lucide-react';
 import PricingSection from './PricingSection';
 
 const LandingPage: React.FC = () => {
@@ -58,10 +58,10 @@ const LandingPage: React.FC = () => {
   ];
 
   const stats = [
-    { number: "10", label: "Active Learners" },
-    { number: "50", label: "Practice Projects" },
-    { number: "95%", label: "Success Rate" },
-    { number: "24/7", label: "Support Available" }
+    { number: "24/7", label: "Support", icon: <Clock className="w-6 h-6 text-indigo-600" />, color: "bg-indigo-100" },
+    { number: "Quality", label: "Courses", icon: <Award className="w-6 h-6 text-purple-600" />, color: "bg-purple-100" },
+    { number: "Hands-On", label: "Learning", icon: <Terminal className="w-6 h-6 text-pink-600" />, color: "bg-pink-100" },
+    { number: "Beginner", label: "Friendly", icon: <Heart className="w-6 h-6 text-green-600" />, color: "bg-green-100" }
   ];
 
   const technologies = [
@@ -89,14 +89,14 @@ const LandingPage: React.FC = () => {
               <a href="#features" className="text-gray-600 hover:text-indigo-600 transition-colors">Features</a>
               <a href="#about" className="text-gray-600 hover:text-indigo-600 transition-colors">About</a>
               <a href="#pricing" className="text-gray-600 hover:text-indigo-600 transition-colors">Pricing</a>
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
               >
                 Sign In
               </Link>
-              <Link 
-                to="/signup" 
+              <Link
+                to="/signup"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 Get Started
@@ -109,10 +109,9 @@ const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center transition-all duration-1000 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
-            
+          <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}>
+
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               Master the{' '}
               <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -121,14 +120,14 @@ const LandingPage: React.FC = () => {
               <br />
               Build Amazing Apps
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Join thousands of developers learning MongoDB, Express.js, React, and Node.js through 
+              Join thousands of developers learning MongoDB, Express.js, React, and Node.js through
               hands-on projects and expert-crafted curriculum. Start your full-stack journey today.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Link 
+              <Link
                 to="/signup"
                 className="group bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center space-x-2"
               >
@@ -140,11 +139,10 @@ const LandingPage: React.FC = () => {
             {/* Technology Stack */}
             <div className="flex flex-wrap justify-center items-center gap-6 mb-16">
               {technologies.map((tech, index) => (
-                <div 
+                <div
                   key={tech.name}
-                  className={`flex items-center space-x-3 bg-white rounded-xl px-6 py-3 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 ${
-                    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-                  }`}
+                  className={`flex items-center space-x-3 bg-white rounded-xl px-6 py-3 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                    }`}
                   style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   <span className="text-2xl">{tech.icon}</span>
@@ -157,18 +155,22 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gradient-to-r from-indigo-50 to-purple-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/50 to-purple-50/50" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div 
+              <div
                 key={stat.label}
-                className="text-center"
+                className="group p-6 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 text-center transform hover:-translate-y-1"
               >
-                <div className="text-4xl md:text-5xl font-bold text-indigo-600 mb-2">
+                <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  {stat.icon}
+                </div>
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1">
                   {stat.number}
                 </div>
-                <div className="text-gray-600 font-medium">
+                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
                   {stat.label}
                 </div>
               </div>
@@ -189,10 +191,10 @@ const LandingPage: React.FC = () => {
               Our comprehensive platform provides all the tools and resources you need to become a proficient full-stack developer.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={feature.title}
                 className="group bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-indigo-200"
               >
@@ -219,7 +221,7 @@ const LandingPage: React.FC = () => {
               About <span className="text-indigo-600">Skillsphere</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We're on a mission to democratize full-stack development education by providing 
+              We're on a mission to democratize full-stack development education by providing
               accessible, practical, and industry-relevant learning experiences.
             </p>
           </div>
@@ -233,11 +235,11 @@ const LandingPage: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Founded by Industry Experts
+                      Built for Beginners
                     </h3>
                     <p className="text-gray-600">
-                      Created by senior developers from top tech companies who understand exactly 
-                      what skills are needed to succeed in today's market.
+                      Designed with simplicity and clarity in mind, helping learners start
+                      from scratch and build skills step by step.
                     </p>
                   </div>
                 </div>
@@ -248,11 +250,11 @@ const LandingPage: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Community-Driven Approach
+                      Community-Centered Learning
                     </h3>
                     <p className="text-gray-600">
-                      Learn alongside 10,000+ active developers in our supportive community. 
-                      Get help, share knowledge, and grow together.
+                      Learn in a friendly environment where collaboration, discussion,
+                      and peer support are encouraged.
                     </p>
                   </div>
                 </div>
@@ -263,11 +265,11 @@ const LandingPage: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      Proven Track Record
+                      Practical & Skill-Focused
                     </h3>
                     <p className="text-gray-600">
-                      95% of our students land their dream jobs within 6 months of completion, 
-                      with starting salaries averaging $75,000+.
+                      Focused on hands-on learning so you gain real confidence by
+                      building and applying what you learn.
                     </p>
                   </div>
                 </div>
@@ -278,34 +280,35 @@ const LandingPage: React.FC = () => {
               <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8">
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-indigo-600 mb-1">50+</div>
-                    <div className="text-sm text-gray-600">Expert Instructors</div>
+                    <div className="text-3xl font-bold text-indigo-600 mb-1">24/7</div>
+                    <div className="text-sm text-gray-600">Learning Support</div>
                   </div>
                   <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-purple-600 mb-1">1000+</div>
-                    <div className="text-sm text-gray-600">Hours of Content</div>
+                    <div className="text-3xl font-bold text-purple-600 mb-1">Quality</div>
+                    <div className="text-sm text-gray-600">Course Content</div>
                   </div>
                   <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-pink-600 mb-1">25+</div>
-                    <div className="text-sm text-gray-600">Countries Reached</div>
+                    <div className="text-3xl font-bold text-pink-600 mb-1">Hands-On</div>
+                    <div className="text-sm text-gray-600">Practice Based</div>
                   </div>
                   <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-green-600 mb-1">4.9/5</div>
-                    <div className="text-sm text-gray-600">Student Rating</div>
+                    <div className="text-3xl font-bold text-green-600 mb-1">Beginner</div>
+                    <div className="text-sm text-gray-600">Friendly Approach</div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   <h4 className="font-semibold text-gray-900 mb-3">Our Philosophy</h4>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    "We believe that anyone can become a great developer with the right guidance, 
-                    practical experience, and supportive community. Our hands-on approach ensures 
-                    you don't just learn concepts – you build real applications that showcase your skills."
+                    "We believe learning should be simple, practical, and accessible.
+                    Our goal is to help learners grow step by step through hands-on
+                    practice, clear explanations, and continuous support."
                   </p>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
@@ -326,21 +329,21 @@ const LandingPage: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { 
-                step: "01", 
-                title: "Fundamentals", 
+              {
+                step: "01",
+                title: "Fundamentals",
                 description: "Learn JavaScript, HTML, CSS, and programming basics",
                 duration: "4-6 weeks"
               },
-              { 
-                step: "02", 
-                title: "Backend Development", 
+              {
+                step: "02",
+                title: "Backend Development",
                 description: "Master Node.js, Express.js, and MongoDB",
                 duration: "6-8 weeks"
               },
-              { 
-                step: "03", 
-                title: "Frontend & Full-Stack", 
+              {
+                step: "03",
+                title: "Frontend & Full-Stack",
                 description: "Build with React and connect everything together",
                 duration: "8-10 weeks"
               }
@@ -376,12 +379,12 @@ const LandingPage: React.FC = () => {
             Ready to start your journey?
           </h2>
           <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who have transformed their careers with Skillsphere. 
+            Join thousands of developers who have transformed their careers with Skillsphere.
             Start learning today with our free tier.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
+            <Link
               to="/signup"
               className="bg-white text-indigo-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-colors transform hover:scale-105"
             >
@@ -403,7 +406,7 @@ const LandingPage: React.FC = () => {
                 <span className="text-2xl font-bold">Skillsphere</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
-                Empowering developers worldwide with comprehensive MERN stack education 
+                Empowering developers worldwide with comprehensive MERN stack education
                 and hands-on project experience.
               </p>
               <div className="flex space-x-4">
@@ -418,7 +421,7 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h4 className="text-lg font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-gray-400">
@@ -428,7 +431,7 @@ const LandingPage: React.FC = () => {
                 <li><a href="#" className="hover:text-white transition-colors">Projects</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="text-lg font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
@@ -439,7 +442,7 @@ const LandingPage: React.FC = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
             <p>&copy; 2025 Skillsphere. All rights reserved. Built with ❤️ for developers.</p>
           </div>

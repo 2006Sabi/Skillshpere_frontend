@@ -1,16 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import SignUpPage from './components/SignUpPage';
-import LoginPage from './components/LoginPage';
-import MainLayout from './components/MainLayout';
-import HomePage from './components/HomePage';
-import RoadmapPage from './components/RoadmapPage';
-import CoursesPage from './components/CoursesPage';
-import ProjectsPage from './components/ProjectsPage';
-import CompilerPage from './components/CompilerPage';
-import ProfilePage from './components/ProfilePage';
-import { isUserAuthenticated, getAuthData, clearAuthData, addActivity, generateId } from './utils/localStorage';
+// src/App.tsx
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import LandingPage from "./components/LandingPage";
+import SignUpPage from "./components/SignUpPage";
+import LoginPage from "./components/LoginPage";
+import MainLayout from "./components/MainLayout";
+import HomePage from "./components/HomePage";
+import RoadmapPage from "./components/RoadmapPage";
+import CoursesPage from "./components/CoursesPage";
+import ProjectsPage from "./components/ProjectsPage";
+import CompilerPage from "./components/CompilerPage";
+import ProfilePage from "./components/ProfilePage";
+
+import TasksPage from "./components/Tasks"; // <-- Ensure this file exists
+import AdminRoutes from "./admin/routes/AdminRoutes";
+import {
+  isUserAuthenticated,
+  getAuthData,
+  clearAuthData,
+  addActivity,
+  generateId,
+} from "./utils/localStorage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,10 +47,10 @@ function App() {
     // Add login activity
     addActivity({
       id: generateId(),
-      type: 'login',
-      title: 'Logged In',
-      description: 'Successfully logged into StackBuilder',
-      timestamp: new Date().toISOString()
+      type: "login",
+      title: "Logged In",
+      description: "Successfully logged into StackBuilder",
+      timestamp: new Date().toISOString(),
     });
   };
 
@@ -61,23 +76,27 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route 
-            path="/login" 
-            element={<LoginPage onLogin={handleLogin} />} 
-          />
+          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+
           <Route
             path="/dashboard/*"
             element={
               isAuthenticated ? (
                 <MainLayout onLogout={handleLogout}>
                   <Routes>
+                    {/* main dashboard routes */}
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/home" element={<HomePage />} />
-                    <Route path="/roadmap" element={<RoadmapPage />} />
-                    <Route path="/courses" element={<CoursesPage />} />
-                    <Route path="/projects" element={<ProjectsPage />} />
-                    <Route path="/compiler" element={<CompilerPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="home" element={<HomePage />} />
+                    <Route path="roadmap" element={<RoadmapPage />} />
+                    <Route path="courses" element={<CoursesPage />} />
+                    <Route path="projects" element={<ProjectsPage />} />
+                    <Route path="compiler" element={<CompilerPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
+
+                    {/* Tasks route: /dashboard/tasks */}
+                    <Route path="tasks" element={<TasksPage />} />
+
+                    {/* You can add other /dashboard/* routes here */}
                   </Routes>
                 </MainLayout>
               ) : (
@@ -85,6 +104,9 @@ function App() {
               )
             }
           />
+
+          {/* Admin Routes */}
+          <Route path="/admin/*" element={<AdminRoutes />} />
         </Routes>
       </div>
     </Router>

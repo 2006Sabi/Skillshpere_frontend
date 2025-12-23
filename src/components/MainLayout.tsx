@@ -1,6 +1,7 @@
 // src/layouts/MainLayout.tsx
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import UserAvatar from "./common/UserAvatar";
 import {
   Home,
   Map,
@@ -169,8 +170,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isSidebarOpen ? "translate-x-0 visible" : "-translate-x-full invisible lg:visible"
-          }`}
+        className={`fixed inset - y - 0 left - 0 z - 50 w - 72 bg - white shadow - xl transform transition - transform duration - 300 ease -in -out lg: translate - x - 0 lg:static lg: inset - 0 ${isSidebarOpen ? "translate-x-0 visible" : "-translate-x-full invisible lg:visible"
+          } `}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -278,24 +279,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsSidebarOpen(false)}
-                  className={`group flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                    ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
+                  className={`group flex items - center px - 4 py - 3 rounded - xl text - sm font - medium transition - all duration - 200 ${isActive
+                      ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    } `}
                 >
                   <div
-                    className={`flex-shrink-0 transition-colors ${isActive
-                      ? "text-indigo-600"
-                      : "text-gray-400 group-hover:text-gray-600"
-                      }`}
+                    className={`flex - shrink - 0 transition - colors ${isActive
+                        ? "text-indigo-600"
+                        : "text-gray-400 group-hover:text-gray-600"
+                      } `}
                   >
                     {item.icon}
                   </div>
                   <div className="ml-3 flex-1">
                     <div className="text-sm font-medium">{item.label}</div>
                     <div
-                      className={`text-xs mt-0.5 ${isActive ? "text-indigo-500" : "text-gray-400"
-                        }`}
+                      className={`text - xs mt - 0.5 ${isActive ? "text-indigo-500" : "text-gray-400"
+                        } `}
                     >
                       {item.description}
                     </div>
@@ -370,10 +371,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
             <div className="flex items-center space-x-2">
 
               {userProfile ? (
-                <img
-                  src={avatarSrc || "/placeholder-avatar.png"}
-                  alt={userProfile.username || "avatar"}
-                  className="w-8 h-8 rounded-lg object-cover"
+                <UserAvatar
+                  src={avatarSrc}
+                  name={userProfile.firstName || userProfile.username}
+                  size="sm"
+                  className="rounded-lg"
                 />
               ) : (
                 <Link to="/login" className="text-sm text-indigo-600">
@@ -421,8 +423,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
 
         {/* Content */}
         <main
-          className={`flex-1 overflow-auto transition-all duration-500 ${isVisible ? "opacity-100" : "opacity-0"
-            }`}
+          className={`flex - 1 overflow - auto transition - all duration - 500 ${isVisible ? "opacity-100" : "opacity-0"
+            } `}
         >
           <div className="p-4 lg:p-6">{children}</div>
         </main>

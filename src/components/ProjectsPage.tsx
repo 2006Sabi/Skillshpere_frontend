@@ -222,7 +222,8 @@ const ProjectsPage: React.FC = () => {
     const fetchProjects = async () => {
       try {
         // Public endpoint to get projects
-        const res = await fetch('/api/projects');
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+        const res = await fetch(`${API_BASE}/api/projects`);
         if (res.ok) {
           const data = await res.json();
           setProjectsData(data);

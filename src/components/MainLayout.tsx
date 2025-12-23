@@ -363,7 +363,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onLogout }) => {
                 <Code className="w-5 h-5 text-white" />
               </div>
               <span className="text-lg font-bold text-gray-900">
-                StackBuilder
+                Skillsphere
               </span>
             </div>
 

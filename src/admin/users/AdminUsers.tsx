@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Define User Interface
 interface User {
@@ -17,10 +17,11 @@ const AdminUsers = () => {
         fetchUsers();
     }, []);
 
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const res = await fetch('/api/admin/users', {
+            const res = await fetch(`${API_BASE}/api/admin/users`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -35,7 +36,7 @@ const AdminUsers = () => {
     const toggleBlock = async (id: string) => {
         try {
             const token = localStorage.getItem('authToken');
-            await fetch(`/api/admin/users/${id}/block`, {
+            await fetch(`${API_BASE}/api/admin/users/${id}/block`, {
                 method: 'PATCH',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

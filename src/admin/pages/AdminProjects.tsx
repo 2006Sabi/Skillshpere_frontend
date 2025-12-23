@@ -32,9 +32,10 @@ const AdminProjects = () => {
     }, []);
 
     const fetchProjects = async () => {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
         try {
             const token = localStorage.getItem('authToken');
-            const res = await fetch('/api/admin/projects', {
+            const res = await fetch(`${API_BASE}/api/admin/projects`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -50,7 +51,8 @@ const AdminProjects = () => {
         if (!window.confirm("Are you sure?")) return;
         try {
             const token = localStorage.getItem('authToken');
-            await fetch(`/api/admin/projects/${id}`, {
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+            await fetch(`${API_BASE}/api/admin/projects/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -83,7 +85,8 @@ const AdminProjects = () => {
                 techStack: formData.techStack.split(',').map(s => s.trim()) // Convert comma-separated string to array
             };
 
-            const url = editingId ? `http://localhost:5001/api/admin/projects/${editingId}` : 'http://localhost:5001/api/admin/projects';
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+            const url = editingId ? `${API_BASE}/api/admin/projects/${editingId}` : `${API_BASE}/api/admin/projects`;
             const method = editingId ? 'PUT' : 'POST';
 
             const res = await fetch(url, {

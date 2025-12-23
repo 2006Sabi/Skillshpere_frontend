@@ -5,6 +5,7 @@ import {
   saveAuthData,
   generateId,
   saveUserProfile,
+  setAuthToken,
 } from "../utils/localStorage";
 
 interface LoginPageProps {
@@ -62,7 +63,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setErrors({ username: "", password: "" });
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +94,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       // Backend now returns 403 if role mismatch, which is caught below as error message
 
       // Save authentication token to localStorage
-      localStorage.setItem("authToken", data.token);
+      setAuthToken(data.token, {
+        userId: data.user.id || data.user._id,
+        username: data.user.username
+      });
 
       // Construct and save user profile
       if (data.user) {

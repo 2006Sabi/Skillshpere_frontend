@@ -366,7 +366,8 @@ export const clearAuthData = (): void => {
 
 export const isUserAuthenticated = (): boolean => {
   const authData = getAuthData();
-  return !!(authData && authData.isAuthenticated);
+  const token = getAuthToken();
+  return !!((authData && authData.isAuthenticated) || token);
 };
 
 // ----------------------

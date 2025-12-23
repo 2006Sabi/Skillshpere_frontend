@@ -13,8 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 import { getAuthToken, clearAuthToken } from "../utils/localStorage";
-const envApiBase = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
-const API_BASE = envApiBase.replace("localhost", "127.0.0.1");
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
 
 type UserProfile = {
   id?: string;

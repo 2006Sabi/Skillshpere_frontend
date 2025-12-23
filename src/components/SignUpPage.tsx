@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, User, Mail, Phone, MapPin, Globe, FileText, Code, ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { saveAuthData, generateId, saveUserProfile } from '../utils/localStorage';
+import { saveAuthData, generateId, saveUserProfile, setAuthToken } from '../utils/localStorage';
 
 const SignUpPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -100,7 +100,8 @@ const SignUpPage: React.FC = () => {
     setErrors({});
 
     try {
-      const res = await fetch('/api/auth/register', {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +127,10 @@ const SignUpPage: React.FC = () => {
       }
 
       // Save authentication token to localStorage
-      localStorage.setItem('authToken', data.token);
+      setAuthToken(data.token, {
+        userId: data.user.id || data.user._id,
+        username: data.user.username
+      });
 
       if (data.user) {
         const userProfile = {
@@ -207,7 +211,7 @@ const SignUpPage: React.FC = () => {
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Code className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Join StackBuilder</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Skillsphere</h1>
             <p className="text-gray-600">Create your account and start your learning journey</p>
           </div>
 

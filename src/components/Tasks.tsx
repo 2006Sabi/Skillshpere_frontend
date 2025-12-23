@@ -23,8 +23,7 @@ type ServerTask = {
   createdAt?: string;
 };
 
-const envApiBase = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
-const API_BASE = envApiBase.replace("localhost", "127.0.0.1");
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
 
 const columnOrder: Array<"todo" | "in-progress" | "done"> = [
   "todo",

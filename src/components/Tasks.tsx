@@ -24,7 +24,7 @@ type ServerTask = {
   createdAt?: string;
 };
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+
 
 const columnOrder: Array<"todo" | "in-progress" | "done"> = [
   "todo",
@@ -59,7 +59,7 @@ export default function TasksPage(): JSX.Element {
     if (!editingTask || !editingTask.title.trim()) return;
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch(`${API_BASE} /api/tasks / ${editingTask.id || editingTask._id} `, {
+      const res = await fetch(`${API_BASE}/api/tasks/${editingTask.id || editingTask._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export default function TasksPage(): JSX.Element {
         setLoading(true);
         setError(null);
         const token = localStorage.getItem("authToken");
-        const res = await fetch(`${API_BASE} /api/tasks`, {
+        const res = await fetch(`${API_BASE}/api/tasks`, {
           headers: token ? { Authorization: `Bearer ${token} ` } : {},
           signal: ac.signal,
           cache: "no-store",
@@ -156,7 +156,7 @@ export default function TasksPage(): JSX.Element {
     try {
       const token = localStorage.getItem("authToken");
       const body: any = { status: newStatus, completed: newStatus === "done" };
-      const res = await fetch(`${API_BASE} /api/tasks / ${taskId} `, {
+      const res = await fetch(`${API_BASE}/api/tasks/${taskId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -214,7 +214,7 @@ export default function TasksPage(): JSX.Element {
       try {
         setLoading(true);
         const token = localStorage.getItem("authToken");
-        const res = await fetch(`${API_BASE} /api/tasks`, {
+        const res = await fetch(`${API_BASE}/api/tasks`, {
           headers: token ? { Authorization: `Bearer ${token} ` } : {},
         });
         if (res.ok) {
@@ -242,7 +242,7 @@ export default function TasksPage(): JSX.Element {
     }
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch(`${API_BASE} /api/tasks`, {
+      const res = await fetch(`${API_BASE}/api/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -496,8 +496,8 @@ export default function TasksPage(): JSX.Element {
                                 {...draggableProvided.draggableProps}
                                 {...draggableProvided.dragHandleProps}
                                 className={`mb - 3 p - 3 bg - white rounded shadow - sm border ${dragSnapshot.isDragging
-                                    ? "ring-2 ring-indigo-300"
-                                    : ""
+                                  ? "ring-2 ring-indigo-300"
+                                  : ""
                                   } `}
                               >
                                 <div className="flex items-start justify-between">

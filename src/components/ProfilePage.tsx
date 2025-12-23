@@ -39,8 +39,7 @@ const emptyProfile: ProfileState = {
   profileCompletion: 0,
 };
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "http://127.0.0.1:5001";
-
+import { API_BASE } from "../config";
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
 

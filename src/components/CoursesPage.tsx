@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { API_BASE } from "../config";
 import axios from "axios";
 import {
   Search,
@@ -86,9 +88,8 @@ const CoursesPage: React.FC = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
-        const response = await axios.get(`${API_BASE}/api/courses`);
-        const backendCourses = response.data;
+        const res = await fetch(`${API_BASE} /api/courses`);
+        const backendCourses = await res.json();
 
         // Map backend data to frontend structure
         const mappedCourses = backendCourses.map((course: any) => ({
@@ -385,19 +386,19 @@ const CoursesPage: React.FC = () => {
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded ${viewMode === "grid"
-                    ? "bg-white shadow"
-                    : "hover:bg-gray-200"
-                    }`}
+                  className={`p - 2 rounded ${viewMode === "grid"
+                      ? "bg-white shadow"
+                      : "hover:bg-gray-200"
+                    } `}
                 >
                   <Grid3X3 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded ${viewMode === "list"
-                    ? "bg-white shadow"
-                    : "hover:bg-gray-200"
-                    }`}
+                  className={`p - 2 rounded ${viewMode === "list"
+                      ? "bg-white shadow"
+                      : "hover:bg-gray-200"
+                    } `}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -460,19 +461,19 @@ const CoursesPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div
           className={`${viewMode === "grid"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            : "space-y-6"
-            }`}
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              : "space-y-6"
+            } `}
         >
           {filteredCourses.map((course) => (
             <div
               key={course._id}
-              className={`bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group ${viewMode === "list" ? "flex" : ""
-                }`}
+              className={`bg - white rounded - 2xl overflow - hidden shadow - lg hover: shadow - xl transition - all duration - 300 border border - gray - 100 group ${viewMode === "list" ? "flex" : ""
+                } `}
             >
               <div
                 className={`relative ${viewMode === "list" ? "w-72 flex-shrink-0" : ""
-                  }`}
+                  } `}
               >
                 <img
                   src={course.thumbnail}
@@ -487,17 +488,18 @@ const CoursesPage: React.FC = () => {
                   className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
                 >
                   <Heart
-                    className={`w-5 h-5 ${wishlist.has(course._id)
-                      ? "fill-red-500 text-red-500"
-                      : "text-gray-600"
-                      }`}
+                    className={`w - 5 h - 5 ${wishlist.has(course._id)
+                        ? "fill-red-500 text-red-500"
+                        : "text-gray-600"
+                      } `}
                   />
                 </button>
                 <div className="absolute bottom-4 left-4 flex gap-2">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md bg-white/90 ${getLevelColor(
+                    className={`px - 3 py - 1 rounded - full text - xs font - medium backdrop - blur - md bg - white / 90 ${getLevelColor(
                       course.level
-                    )}`}
+                    )
+                      } `}
                   >
                     {course.level.charAt(0).toUpperCase() +
                       course.level.slice(1)}
@@ -526,9 +528,10 @@ const CoursesPage: React.FC = () => {
                         className="w-5 h-5 rounded-full object-contain"
                       />
                       <span
-                        className={`text-xs px-2 py-0.5 rounded ${getProviderColor(
+                        className={`text - xs px - 2 py - 0.5 rounded ${getProviderColor(
                           course.provider.name
-                        )}`}
+                        )
+                          } `}
                       >
                         {course.provider.name}
                       </span>
@@ -583,7 +586,7 @@ const CoursesPage: React.FC = () => {
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      {typeof course.duration === 'string' ? course.duration : `${course.duration.hours}h`}
+                      {typeof course.duration === 'string' ? course.duration : `${course.duration.hours} h`}
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="w-4 h-4" />

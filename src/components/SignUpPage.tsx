@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, User, Mail, Phone, MapPin, Globe, FileText, Code, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { saveAuthData, generateId, saveUserProfile, setAuthToken } from '../utils/localStorage';
+import { API_BASE } from '../config';
 
 const SignUpPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -100,7 +101,6 @@ const SignUpPage: React.FC = () => {
     setErrors({});
 
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
       const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: 'POST',
         headers: {

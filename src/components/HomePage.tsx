@@ -12,8 +12,8 @@ import {
   Play,
   Zap,
 } from "lucide-react";
-import { getAuthToken, clearAuthToken } from "../utils/localStorage";
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
+import { getAuthToken, clearAuthToken, getRecentActivities, isUserAuthenticated } from "../utils/localStorage";
+import { API_BASE } from "../config";
 
 type UserProfile = {
   id?: string;

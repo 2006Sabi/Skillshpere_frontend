@@ -85,7 +85,6 @@ const AdminProjects = () => {
                 techStack: formData.techStack.split(',').map(s => s.trim()) // Convert comma-separated string to array
             };
 
-            const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
             const url = editingId ? `${API_BASE}/api/admin/projects/${editingId}` : `${API_BASE}/api/admin/projects`;
             const method = editingId ? 'PUT' : 'POST';
 

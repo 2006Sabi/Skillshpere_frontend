@@ -17,7 +17,6 @@ const AdminUsers = () => {
         fetchUsers();
     }, []);
 
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('authToken');

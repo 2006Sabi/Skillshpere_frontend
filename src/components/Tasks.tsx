@@ -1,5 +1,6 @@
 
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { API_BASE } from "../config";
 import {
   DragDropContext,
   Droppable,
@@ -58,11 +59,11 @@ export default function TasksPage(): JSX.Element {
     if (!editingTask || !editingTask.title.trim()) return;
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch(`${API_BASE}/api/tasks/${editingTask.id || editingTask._id}`, {
+      const res = await fetch(`${API_BASE} /api/tasks / ${editingTask.id || editingTask._id} `, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(token ? { Authorization: `Bearer ${token} ` } : {}),
         },
         body: JSON.stringify({
           title: editingTask.title,
@@ -92,14 +93,14 @@ export default function TasksPage(): JSX.Element {
         setLoading(true);
         setError(null);
         const token = localStorage.getItem("authToken");
-        const res = await fetch(`${API_BASE}/api/tasks`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const res = await fetch(`${API_BASE} /api/tasks`, {
+          headers: token ? { Authorization: `Bearer ${token} ` } : {},
           signal: ac.signal,
           cache: "no-store",
         });
         if (!res.ok) {
           const text = await res.text();
-          throw new Error(`Failed to load tasks: ${res.status} ${text}`);
+          throw new Error(`Failed to load tasks: ${res.status} ${text} `);
         }
         const data: ServerTask[] = await res.json();
         setTasks(
@@ -155,17 +156,17 @@ export default function TasksPage(): JSX.Element {
     try {
       const token = localStorage.getItem("authToken");
       const body: any = { status: newStatus, completed: newStatus === "done" };
-      const res = await fetch(`${API_BASE}/api/tasks/${taskId}`, {
+      const res = await fetch(`${API_BASE} /api/tasks / ${taskId} `, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(token ? { Authorization: `Bearer ${token} ` } : {}),
         },
         body: JSON.stringify(body),
       });
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(`Failed to update task: ${res.status} ${text}`);
+        throw new Error(`Failed to update task: ${res.status} ${text} `);
       }
       const updated: ServerTask = await res.json().catch(() => null as any);
       // merge updated task into local tasks if returned
@@ -213,8 +214,8 @@ export default function TasksPage(): JSX.Element {
       try {
         setLoading(true);
         const token = localStorage.getItem("authToken");
-        const res = await fetch(`${API_BASE}/api/tasks`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const res = await fetch(`${API_BASE} /api/tasks`, {
+          headers: token ? { Authorization: `Bearer ${token} ` } : {},
         });
         if (res.ok) {
           const data: ServerTask[] = await res.json();
@@ -241,15 +242,15 @@ export default function TasksPage(): JSX.Element {
     }
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch(`${API_BASE}/api/tasks`, {
+      const res = await fetch(`${API_BASE} /api/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(token ? { Authorization: `Bearer ${token} ` } : {}),
         },
         body: JSON.stringify({ title: newTitle, priority: newPriority }),
       });
-      if (!res.ok) throw new Error(`Create failed: ${res.status}`);
+      if (!res.ok) throw new Error(`Create failed: ${res.status} `);
       const created = await res.json();
       setTasks((p) => [created, ...p]);
       setCreating(false);
@@ -284,8 +285,8 @@ export default function TasksPage(): JSX.Element {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setView("list")}
-            className={`px-3 py-2 rounded-md flex items-center gap-2 ${view === "list" ? "bg-indigo-600 text-white" : "bg-white border"
-              }`}
+            className={`px - 3 py - 2 rounded - md flex items - center gap - 2 ${view === "list" ? "bg-indigo-600 text-white" : "bg-white border"
+              } `}
             title="List view"
           >
             <List className="w-4 h-4" /> List
@@ -293,8 +294,8 @@ export default function TasksPage(): JSX.Element {
 
           <button
             onClick={() => setView("kanban")}
-            className={`px-3 py-2 rounded-md flex items-center gap-2 ${view === "kanban" ? "bg-indigo-600 text-white" : "bg-white border"
-              }`}
+            className={`px - 3 py - 2 rounded - md flex items - center gap - 2 ${view === "kanban" ? "bg-indigo-600 text-white" : "bg-white border"
+              } `}
             title="Kanban view"
           >
             <Grid className="w-4 h-4" /> Kanban
@@ -389,15 +390,16 @@ export default function TasksPage(): JSX.Element {
                       <Pencil className="w-3 h-3" />
                     </button>
                     <div
-                      className={`px-2 py-1 text-xs text-white rounded ${getBadgeColor(
+                      className={`px - 2 py - 1 text - xs text - white rounded ${getBadgeColor(
                         t.priority
-                      )}`}
+                      )
+                        } `}
                     >
                       {t.priority ?? "medium"}
                     </div>
                     <div
                       className={`${t.completed ? "text-green-600" : "text-gray-400"
-                        } text-sm`}
+                        } text - sm`}
                     >
                       {t.completed ? (
                         <span className="flex items-center gap-1">
@@ -478,8 +480,8 @@ export default function TasksPage(): JSX.Element {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`min-h-[200px] p-1 rounded ${snapshot.isDraggingOver ? "bg-indigo-50" : ""
-                          }`}
+                        className={`min - h - [200px] p - 1 rounded ${snapshot.isDraggingOver ? "bg-indigo-50" : ""
+                          } `}
                         style={{ minHeight: 60 }}
                       >
                         {columns[colKey].map((task, idx) => (
@@ -493,10 +495,10 @@ export default function TasksPage(): JSX.Element {
                                 ref={draggableProvided.innerRef}
                                 {...draggableProvided.draggableProps}
                                 {...draggableProvided.dragHandleProps}
-                                className={`mb-3 p-3 bg-white rounded shadow-sm border ${dragSnapshot.isDragging
-                                  ? "ring-2 ring-indigo-300"
-                                  : ""
-                                  }`}
+                                className={`mb - 3 p - 3 bg - white rounded shadow - sm border ${dragSnapshot.isDragging
+                                    ? "ring-2 ring-indigo-300"
+                                    : ""
+                                  } `}
                               >
                                 <div className="flex items-start justify-between">
                                   <div className="flex-1 min-w-0">
@@ -517,9 +519,10 @@ export default function TasksPage(): JSX.Element {
                                       <Pencil className="w-3 h-3" />
                                     </button>
                                     <div
-                                      className={`px-2 py-1 text-xs text-white rounded ${getBadgeColor(
+                                      className={`px - 2 py - 1 text - xs text - white rounded ${getBadgeColor(
                                         task.priority
-                                      )}`}
+                                      )
+                                        } `}
                                     >
                                       {task.priority ?? "medium"}
                                     </div>

@@ -7,6 +7,7 @@ import {
   saveUserProfile,
   setAuthToken,
 } from "../utils/localStorage";
+import { API_BASE } from "../config";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -63,7 +64,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setErrors({ username: "", password: "" });
 
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {

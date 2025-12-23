@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE } from "../config";
 
 const ProjectsPage: React.FC = () => {
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
@@ -222,7 +223,6 @@ const ProjectsPage: React.FC = () => {
     const fetchProjects = async () => {
       try {
         // Public endpoint to get projects
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
         const res = await fetch(`${API_BASE}/api/projects`);
         if (res.ok) {
           const data = await res.json();

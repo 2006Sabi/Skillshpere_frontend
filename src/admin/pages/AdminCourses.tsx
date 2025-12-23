@@ -86,7 +86,6 @@ const AdminCourses = () => {
                 techStack: formData.techStack.split(',').map(tech => tech.trim()).filter(tech => tech !== "")
             };
 
-            const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5001";
             const url = editingId ? `${API_BASE}/api/admin/courses/${editingId}` : `${API_BASE}/api/admin/courses`;
             const method = editingId ? 'PUT' : 'POST';
 
